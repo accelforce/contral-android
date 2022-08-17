@@ -1,3 +1,6 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.report.ReportMergeTask
+
 buildscript {
     ext {
         compose_version = '1.2.0'
@@ -7,6 +10,32 @@ plugins {
     id 'com.android.application' version '7.2.2' apply false
     id 'com.android.library' version '7.2.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.0' apply false
+    id 'io.gitlab.arturbosch.detekt' version '1.21.0' apply false
+}
+
+task detektMergeReport(type: ReportMergeTask) {
+    output = project.layout.buildDirectory.file('reports/detekt/merged.sarif')
+}
+
+allprojects {
+    apply {
+        plugin 'io.gitlab.arturbosch.detekt'
+    }
+    dependencies {
+        detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.21.0'
+    }
+
+    detekt {
+        config = files("${rootProject.rootDir}/detekt.yml")
+        buildUponDefaultConfig true
+
+        tasks.withType(Detekt) { d ->
+            finalizedBy(detektMergeReport)
+            detektMergeReport.configure { m ->
+                m.input.from(d.sarifReportFile)
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {

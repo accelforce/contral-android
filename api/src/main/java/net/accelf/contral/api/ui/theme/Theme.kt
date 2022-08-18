@@ -1,4 +1,4 @@
-package net.accelf.contral.android.ui.theme
+package net.accelf.contral.api.ui.theme
 
 import android.app.Activity
 import android.os.Build

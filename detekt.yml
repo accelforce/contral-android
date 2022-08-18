@@ -25,6 +25,10 @@ formatting:
       - '**/*Test.kt'
   NoWildcardImports:
     active: false
+  TrailingComma:
+    active: true
+    allowTrailingComma: true
+    allowTrailingCommaOnCallSite: true
 
 naming:
   FunctionNaming:

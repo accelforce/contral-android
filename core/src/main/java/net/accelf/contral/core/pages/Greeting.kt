@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import net.accelf.contral.api.ui.theme.ContralAndroidTheme
+import net.accelf.contral.api.ui.theme.ContralTheme
 
 @Composable
 fun Greeting(name: String) {
@@ -23,7 +23,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    ContralAndroidTheme {
+    ContralTheme {
         Greeting("Contral")
     }
 }

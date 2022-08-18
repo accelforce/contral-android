@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import net.accelf.contral.api.ui.theme.ContralAndroidTheme
+import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
 
 @Composable
@@ -51,7 +51,7 @@ fun Navigator(
 fun PreviewNavigator() {
     val navController = rememberNavController()
 
-    ContralAndroidTheme {
+    ContralTheme {
         NavHost(
             navController = navController,
             startDestination = "sample",

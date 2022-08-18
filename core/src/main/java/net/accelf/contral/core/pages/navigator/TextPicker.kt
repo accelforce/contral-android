@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import net.accelf.contral.api.ui.theme.ContralAndroidTheme
+import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
 
 @Composable
@@ -67,7 +67,7 @@ internal fun <T> TextPicker(
 @Composable
 @Preview
 fun PreviewTextPicker() {
-    ContralAndroidTheme {
+    ContralTheme {
         val list = remember { listOf(1, 2, 3, 4, 5) }
         var current by useState(list.first())
 

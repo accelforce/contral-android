@@ -20,6 +20,9 @@ formatting:
   FinalNewline:
     active: true
     insertFinalNewLine: true
+  MaximumLineLength:
+    excludes:
+      - '**/*Test.kt'
   NoWildcardImports:
     active: false
 
@@ -34,6 +37,8 @@ style:
   ForbiddenComment:
     active: false
   MagicNumber:
+    active: false
+  MaxLineLength:
     active: false
   ReturnCount:
     active: false

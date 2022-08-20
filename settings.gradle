@@ -16,3 +16,4 @@ rootProject.name = "contral-android"
 include ':app'
 include ':api'
 include ':core'
+include ':mastodon'

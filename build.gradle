@@ -38,6 +38,16 @@ allprojects {
     }
 }
 
+task connectedAndroidTestCollectReports(type: Copy) {
+    subprojects.forEach { p ->
+        with copySpec {
+            from p.layout.buildDirectory.file('outputs/androidTest-results/connected/test-result.pb')
+            rename "test-result.pb", "${p.name}-test-result.pb"
+        }
+    }
+    into rootProject.layout.buildDirectory.dir('outputs/androidTest')
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

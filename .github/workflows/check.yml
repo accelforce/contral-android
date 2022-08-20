@@ -40,7 +40,12 @@ jobs:
           target: google_apis
           script: |
             chmod +x ./gradlew
-            ./gradlew connectedAndroidTest
+            ./gradlew connectedAndroidTest connectedAndroidTestCollectReports
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: instrument-test-result
+          path: build/outputs/androidTest
 
   lint:
     runs-on: ubuntu-22.04

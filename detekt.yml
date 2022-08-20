@@ -21,8 +21,7 @@ formatting:
     active: true
     insertFinalNewLine: true
   MaximumLineLength:
-    excludes:
-      - '**/*Test.kt'
+    active: false
   NoWildcardImports:
     active: false
   TrailingComma:
@@ -43,7 +42,8 @@ style:
   MagicNumber:
     active: false
   MaxLineLength:
-    active: false
+    excludes:
+      - '**/*Test.kt'
   ReturnCount:
     active: false
   UnusedPrivateMember:

@@ -28,12 +28,14 @@ internal class PreviewPluginProvider : PreviewParameterProvider<Plugin> {
                 name = "Example Plugin",
                 version = 1 minor 2 patch 3,
                 dependencies = emptyMap(),
+                injects = emptyList(),
             ),
             Plugin(
                 id = "net.accelf.contral.mastodon.MastodonPlugin.mastodonPlugin",
                 name = "Mastodon",
                 version = 0 minor 0 patch 0,
                 dependencies = emptyMap(),
+                injects = emptyList(),
             ),
         )
 }

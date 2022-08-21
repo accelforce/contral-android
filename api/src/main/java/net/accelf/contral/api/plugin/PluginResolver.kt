@@ -1,6 +1,8 @@
 package net.accelf.contral.api.plugin
 
 import androidx.annotation.RestrictTo
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidedValue
 
 class PluginResolver(
     private val id: String,
@@ -22,11 +24,17 @@ class PluginResolver(
         dependencies[name] = version
     }
 
+    private val injects = mutableListOf<@Composable () -> ProvidedValue<*>>()
+    fun inject(getValue: @Composable () -> ProvidedValue<*>) {
+        injects.add(getValue)
+    }
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun build() = Plugin(
         id = id,
         name = name ?: id,
         version = version ?: error("Plugin version for $id not defined"),
         dependencies = dependencies,
+        injects = injects,
     )
 }

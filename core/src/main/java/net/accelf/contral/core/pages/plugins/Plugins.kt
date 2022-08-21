@@ -3,9 +3,9 @@ package net.accelf.contral.core.pages.plugins
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import net.accelf.contral.api.plugin.LocalPlugins
 import net.accelf.contral.api.plugin.Plugin
 import net.accelf.contral.api.ui.theme.ContralTheme
+import net.accelf.contral.core.LocalPlugins
 
 @Composable
 internal fun PluginsPage() {

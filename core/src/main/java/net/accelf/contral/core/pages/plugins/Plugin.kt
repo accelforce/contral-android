@@ -29,6 +29,7 @@ internal class PreviewPluginProvider : PreviewParameterProvider<Plugin> {
                 version = 1 minor 2 patch 3,
                 dependencies = emptyMap(),
                 injects = emptyList(),
+                renderRoutes = {},
             ),
             Plugin(
                 id = "net.accelf.contral.mastodon.MastodonPlugin.mastodonPlugin",
@@ -36,6 +37,7 @@ internal class PreviewPluginProvider : PreviewParameterProvider<Plugin> {
                 version = 0 minor 0 patch 0,
                 dependencies = emptyMap(),
                 injects = emptyList(),
+                renderRoutes = {},
             ),
         )
 }

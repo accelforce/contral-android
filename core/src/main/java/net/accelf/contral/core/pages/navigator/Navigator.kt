@@ -17,9 +17,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
+import net.accelf.contral.core.LocalNavController
 
 @Composable
-fun Navigator(
+internal fun NavigatorPage(
+    modifier: Modifier = Modifier,
+) {
+    val navController = LocalNavController.current
+    Navigator(
+        navController = navController,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun Navigator(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
@@ -48,7 +60,7 @@ fun Navigator(
 
 @Composable
 @Preview(showSystemUi = true)
-fun PreviewNavigator() {
+private fun PreviewNavigator() {
     val navController = rememberNavController()
 
     ContralTheme {

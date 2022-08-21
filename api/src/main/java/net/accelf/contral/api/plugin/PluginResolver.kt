@@ -3,6 +3,7 @@ package net.accelf.contral.api.plugin
 import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
+import androidx.navigation.NavGraphBuilder
 
 class PluginResolver(
     private val id: String,
@@ -29,6 +30,11 @@ class PluginResolver(
         injects.add(getValue)
     }
 
+    private val routeRenderers = mutableListOf<(NavGraphBuilder).() -> Unit>()
+    fun addRoutes(routeRenderer: (NavGraphBuilder).() -> Unit) {
+        routeRenderers.add(routeRenderer)
+    }
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun build() = Plugin(
         id = id,
@@ -36,5 +42,8 @@ class PluginResolver(
         version = version ?: error("Plugin version for $id not defined"),
         dependencies = dependencies,
         injects = injects,
+        renderRoutes = {
+            routeRenderers.forEach { it.invoke(this) }
+        },
     )
 }

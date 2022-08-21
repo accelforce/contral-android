@@ -4,6 +4,7 @@ import io.gitlab.arturbosch.detekt.report.ReportMergeTask
 buildscript {
     ext {
         compose_version = '1.2.0'
+        room_version = '2.4.3'
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

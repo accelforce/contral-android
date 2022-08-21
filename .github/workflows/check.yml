@@ -14,9 +14,9 @@ jobs:
         with:
           java-version: 11
 
-      - run: |
-          chmod +x ./gradlew
-          ./gradlew test
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: test
 
   instrument-test:
     runs-on: macos-12
@@ -33,14 +33,36 @@ jobs:
         with:
           java-version: 11
 
+      - uses: gradle/gradle-build-action@v2
+
+      - uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
+      - uses: reactivecircus/android-emulator-runner@v2
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          target: google_apis
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
           target: google_apis
-          script: |
-            chmod +x ./gradlew
-            ./gradlew connectedAndroidTest connectedAndroidTestCollectReports
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedAndroidTest connectedAndroidTestCollectReports
 
       - uses: actions/upload-artifact@v3
         with:
@@ -59,9 +81,9 @@ jobs:
         with:
           java-version: 11
 
-      - run: |
-          chmod +x ./gradlew
-          ./gradlew detekt
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: detekt
 
       - uses: github/codeql-action/upload-sarif@v2
         if: always()

@@ -35,30 +35,9 @@ import net.accelf.contral.mastodon.api.MastodonApi
 import net.accelf.contral.mastodon.api.retrofitBuilder
 import net.accelf.contral.mastodon.models.Account
 import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
 import retrofit2.create
 
 private fun createAuthApi(domain: String): AuthApi = retrofitBuilder
-    .baseUrl(
-        HttpUrl.Builder()
-            .scheme("https")
-            .host(domain)
-            .build(),
-    )
-    .build()
-    .create()
-
-private fun createMastodonApi(domain: String, accessToken: String): MastodonApi = retrofitBuilder
-    .client(
-        OkHttpClient.Builder()
-            .addInterceptor {
-                val request = it.request().newBuilder()
-                    .addHeader("Authorization", "Bearer $accessToken")
-                    .build()
-                it.proceed(request)
-            }
-            .build(),
-    )
     .baseUrl(
         HttpUrl.Builder()
             .scheme("https")
@@ -100,7 +79,7 @@ private suspend fun authorize(
         )
         .getOrNull() ?: error("failed to get token")
 
-    val mastodonApi = createMastodonApi(domain, token.accessToken)
+    val mastodonApi = MastodonApi.create(domain, token.accessToken)
     mastodonApi.getSelfAccount()
         .onSuccess {
             runCatching {

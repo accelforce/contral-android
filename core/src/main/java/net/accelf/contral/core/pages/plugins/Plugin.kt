@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import net.accelf.contral.api.plugin.MinorVersion.Companion.minor
 import net.accelf.contral.api.plugin.MinorVersion.Companion.patch
 import net.accelf.contral.api.plugin.Plugin
+import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.ui.theme.ContralTheme
 
 @Composable
@@ -23,22 +24,18 @@ internal fun Plugin.Render() {
 internal class PreviewPluginProvider : PreviewParameterProvider<Plugin> {
     override val values: Sequence<Plugin>
         get() = sequenceOf(
-            Plugin(
-                id = "net.accelf.contral.core.example.ExamplePlugin.examplePlugin",
-                name = "Example Plugin",
-                version = 1 minor 2 patch 3,
-                dependencies = emptyMap(),
-                injects = emptyList(),
-                renderRoutes = {},
-            ),
-            Plugin(
-                id = "net.accelf.contral.mastodon.MastodonPlugin.mastodonPlugin",
-                name = "Mastodon",
-                version = 0 minor 0 patch 0,
-                dependencies = emptyMap(),
-                injects = emptyList(),
-                renderRoutes = {},
-            ),
+            PluginResolver("net.accelf.contral.core.example.ExamplePlugin.examplePlugin")
+                .apply {
+                    name = "Example Plugin"
+                    version = 1 minor 2 patch 3
+                }
+                .build(),
+            PluginResolver("net.accelf.contral.mastodon.MastodonPlugin.mastodonPlugin")
+                .apply {
+                    name = "Mastodon"
+                    version = 0 minor 0 patch 0
+                }
+                .build(),
         )
 }
 

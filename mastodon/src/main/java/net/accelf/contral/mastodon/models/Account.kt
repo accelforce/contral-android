@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
 @Entity(tableName = "accounts", primaryKeys = ["domain", "id"])
 internal data class Account(
@@ -17,4 +18,7 @@ internal data class Account(
 internal interface AccountDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(vararg accounts: Account)
+
+    @Query("SELECT * FROM accounts;")
+    suspend fun listAccounts(): List<Account>
 }

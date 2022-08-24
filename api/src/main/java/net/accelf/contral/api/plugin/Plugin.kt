@@ -13,4 +13,5 @@ class Plugin(
     val dependencies: Map<String, MinorVersion>,
     val injects: List<@Composable () -> ProvidedValue<*>>,
     val renderRoutes: (NavGraphBuilder).() -> Unit,
+    val renderTimelines: @Composable TimelineRenderer,
 )

@@ -11,6 +11,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import net.accelf.contral.api.plugin.Plugin
+import net.accelf.contral.api.plugin.PluginResolver
+import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.core.plugin.resolvePlugins
 
@@ -28,11 +30,20 @@ fun Main() {
     ) {
         val values = plugins.map(Plugin::injects).flatten().map { it.invoke() }.toTypedArray()
         currentComposer.startProviders(values)
-        ContralTheme {
-            NavHost(navController = navController, startDestination = "navigator") {
-                plugins.forEach { it.renderRoutes.invoke(this) }
+
+        val timelines = remember { mutableListOf<Timeline>() }
+        (PluginResolver.AddTimelineScope { timelines.add(it) })
+            .apply {
+                plugins.forEach { it.renderTimelines(this) }
+            }
+        CompositionLocalProvider(LocalTimelines provides timelines) {
+            ContralTheme {
+                NavHost(navController = navController, startDestination = "navigator") {
+                    plugins.forEach { it.renderRoutes.invoke(this) }
+                }
             }
         }
+
         currentComposer.endProviders()
     }
 }

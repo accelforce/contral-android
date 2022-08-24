@@ -4,6 +4,7 @@ import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
 import androidx.navigation.NavGraphBuilder
+import net.accelf.contral.api.timelines.Timeline
 
 class PluginResolver(
     private val id: String,
@@ -35,6 +36,15 @@ class PluginResolver(
         routeRenderers.add(routeRenderer)
     }
 
+    fun interface AddTimelineScope {
+        fun addTimeline(timeline: Timeline)
+    }
+
+    private val timelineRenderers = mutableListOf<@Composable TimelineRenderer>()
+    fun addTimelines(timelineRenderer: @Composable TimelineRenderer) {
+        timelineRenderers.add(timelineRenderer)
+    }
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun build() = Plugin(
         id = id,
@@ -45,5 +55,10 @@ class PluginResolver(
         renderRoutes = {
             routeRenderers.forEach { it.invoke(this) }
         },
+        renderTimelines = {
+            timelineRenderers.forEach { it.invoke(this) }
+        },
     )
 }
+
+typealias TimelineRenderer = (PluginResolver.AddTimelineScope).() -> Unit

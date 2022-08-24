@@ -3,6 +3,7 @@ package net.accelf.contral.mastodon.api
 import at.connyduck.calladapter.networkresult.NetworkResult
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.create
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -28,6 +29,7 @@ interface MastodonApi {
                             .build()
                         it.proceed(request)
                     }
+                    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
                     .build(),
             )
             .baseUrl(

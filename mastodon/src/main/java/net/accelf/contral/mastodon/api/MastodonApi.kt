@@ -14,6 +14,8 @@ interface MastodonApi {
     @GET("/api/v1/timelines/home")
     suspend fun getHomeTimeline(
         @Query("limit") limit: Int,
+        @Query("min_id") minId: String? = null,
+        @Query("max_id") maxId: String? = null,
     ): NetworkResult<List<Status>>
 
     companion object {

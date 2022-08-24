@@ -8,20 +8,24 @@ import net.accelf.contral.mastodon.api.Status
 
 internal class StatusPagingSource(
     private val mastodonApi: MastodonApi,
-) : PagingSource<String, Status>() {
-    override fun getRefreshKey(state: PagingState<String, Status>): String? =
+) : PagingSource<LoadKey, Status>() {
+    override fun getRefreshKey(state: PagingState<LoadKey, Status>): LoadKey? =
         state.anchorPosition?.let { anchorPosition ->
-            state.closestItemToPosition(anchorPosition)?.id
+            LoadKey(minId = state.closestItemToPosition(anchorPosition)?.id)
         }
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, Status> =
-        mastodonApi.getHomeTimeline(limit = params.loadSize)
+    override suspend fun load(params: LoadParams<LoadKey>): LoadResult<LoadKey, Status> =
+        mastodonApi.getHomeTimeline(
+            limit = params.loadSize,
+            minId = params.key?.minId,
+            maxId = params.key?.maxId,
+        )
             .fold(
                 {
                     LoadResult.Page(
                         data = it,
-                        prevKey = null,
-                        nextKey = null,
+                        prevKey = LoadKey(minId = it.firstOrNull()?.id),
+                        nextKey = LoadKey(maxId = it.lastOrNull()?.id),
                     )
                 },
                 {

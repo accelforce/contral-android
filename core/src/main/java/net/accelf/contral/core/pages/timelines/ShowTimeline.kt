@@ -1,6 +1,7 @@
 package net.accelf.contral.core.pages.timelines
 
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.paging.Pager
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -20,6 +21,7 @@ internal fun ShowTimeline(
             items = pagingItems,
         ) {
             it?.Render()
+            Divider()
         }
     }
 }

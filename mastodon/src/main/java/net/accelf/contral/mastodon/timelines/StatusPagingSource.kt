@@ -24,8 +24,8 @@ internal class StatusPagingSource(
                 {
                     LoadResult.Page(
                         data = it,
-                        prevKey = LoadKey(minId = it.firstOrNull()?.id),
-                        nextKey = LoadKey(maxId = it.lastOrNull()?.id),
+                        prevKey = it.firstOrNull()?.id?.let { id -> LoadKey(minId = id) },
+                        nextKey = it.lastOrNull()?.id?.let { id -> LoadKey(maxId = id) },
                     )
                 },
                 {

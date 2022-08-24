@@ -38,7 +38,9 @@ data class Status(
             AsyncImage(
                 model = account.avatar,
                 contentDescription = account.acct,
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(2.dp),
             )
 
             Column {

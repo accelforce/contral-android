@@ -110,7 +110,7 @@ data class Status(
     }
 }
 
-private class PreviewStatusProvider : PreviewParameterProvider<Status> {
+internal class PreviewStatusProvider : PreviewParameterProvider<Status> {
     override val values: Sequence<Status>
         get() = sequenceOf(
             Status(
@@ -122,8 +122,31 @@ private class PreviewStatusProvider : PreviewParameterProvider<Status> {
                     avatar = "https://robohash.org/sample.png?set=set4",
                     nullableDisplayName = "Test",
                 ),
-                content = "<p>Hi!<br>This is a sample post.</p>",
+                content = "Hi!<br>This is a sample post.",
                 boostedStatus = null,
+            ),
+            Status(
+                id = "234567890234567890",
+                account = Account(
+                    id = "234567890234567890",
+                    acct = "announcement@remote.domain",
+                    username = "announcement",
+                    avatar = "https://robohash.org/sample.png?set=set4",
+                    nullableDisplayName = "",
+                ),
+                content = "",
+                boostedStatus = Status(
+                    id = "123456789123456789",
+                    account = Account(
+                        id = "123456789123456789",
+                        acct = "test",
+                        username = "test",
+                        avatar = "https://robohash.org/sample.png?set=set4",
+                        nullableDisplayName = "Test",
+                    ),
+                    content = "Hi!<br>This is a sample post.",
+                    boostedStatus = null,
+                ),
             ),
         )
 }

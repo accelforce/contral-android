@@ -28,25 +28,26 @@ data class Status(
     @SerialName("id") val id: String,
     @SerialName("account") val account: Account,
     @SerialName("content") val content: Html,
+    @SerialName("reblog") val boostedStatus: Status?,
 ) : TimelineItem {
 
     @Composable
     override fun Render() {
         val uriHandler = LocalUriHandler.current
 
-        Row {
-            AsyncImage(
-                model = account.avatar,
-                contentDescription = account.acct,
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(2.dp),
-            )
-
+        if (boostedStatus != null) {
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    AsyncImage(
+                        model = account.avatar,
+                        contentDescription = account.acct,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(2.dp),
+                    )
+
                     Text(
                         text = account.displayName,
                         maxLines = 1,
@@ -61,14 +62,45 @@ data class Status(
                     )
                 }
 
-                HtmlText(
-                    html = content,
-                ) { annotations ->
-                    annotations.forEach { annotation ->
-                        when (annotation.tag) {
-                            HtmlAnnotations.URL.tag -> {
-                                uriHandler.openUri(annotation.item)
-                                return@HtmlText
+                boostedStatus.Render()
+            }
+        } else {
+            Row {
+                AsyncImage(
+                    model = account.avatar,
+                    contentDescription = account.acct,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(2.dp),
+                )
+
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = account.displayName,
+                            maxLines = 1,
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+
+                        Text(
+                            text = "@${account.acct}",
+                            modifier = Modifier.padding(start = 4.dp),
+                            maxLines = 1,
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+
+                    HtmlText(
+                        html = content,
+                    ) { annotations ->
+                        annotations.forEach { annotation ->
+                            when (annotation.tag) {
+                                HtmlAnnotations.URL.tag -> {
+                                    uriHandler.openUri(annotation.item)
+                                    return@HtmlText
+                                }
                             }
                         }
                     }
@@ -91,6 +123,7 @@ private class PreviewStatusProvider : PreviewParameterProvider<Status> {
                     nullableDisplayName = "Test",
                 ),
                 content = "<p>Hi!<br>This is a sample post.</p>",
+                boostedStatus = null,
             ),
         )
 }

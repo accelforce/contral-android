@@ -12,6 +12,8 @@ output-reports:
     - MdOutputReport
 
 complexity:
+  LongMethod:
+    active: false
   LongParameterList:
     active: false
   NestedBlockDepth:

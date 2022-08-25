@@ -11,8 +11,17 @@ import net.accelf.contral.mastodon.models.Account
 internal class HomeTimeline(
     private val account: Account,
 ) : Timeline {
+
+    private val mastodonApi = MastodonApi.create(account.domain, account.accessToken)
+
     override fun pager() = Pager(PagingConfig(20)) {
-        StatusPagingSource(MastodonApi.create(account.domain, account.accessToken))
+        StatusPagingSource { params ->
+            mastodonApi.getHomeTimeline(
+                limit = params.loadSize,
+                minId = params.key?.minId,
+                maxId = params.key?.maxId,
+            )
+        }
     }
 
     @Composable

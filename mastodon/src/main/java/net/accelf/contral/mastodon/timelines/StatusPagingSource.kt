@@ -2,12 +2,12 @@ package net.accelf.contral.mastodon.timelines
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import at.connyduck.calladapter.networkresult.NetworkResult
 import at.connyduck.calladapter.networkresult.fold
-import net.accelf.contral.mastodon.api.MastodonApi
 import net.accelf.contral.mastodon.api.Status
 
 internal class StatusPagingSource(
-    private val mastodonApi: MastodonApi,
+    private val loader: suspend (LoadParams<LoadKey>) -> NetworkResult<List<Status>>,
 ) : PagingSource<LoadKey, Status>() {
     override fun getRefreshKey(state: PagingState<LoadKey, Status>): LoadKey? =
         state.anchorPosition?.let { anchorPosition ->
@@ -15,11 +15,7 @@ internal class StatusPagingSource(
         }
 
     override suspend fun load(params: LoadParams<LoadKey>): LoadResult<LoadKey, Status> =
-        mastodonApi.getHomeTimeline(
-            limit = params.loadSize,
-            minId = params.key?.minId,
-            maxId = params.key?.maxId,
-        )
+        loader(params)
             .fold(
                 {
                     LoadResult.Page(

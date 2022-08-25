@@ -1,5 +1,6 @@
 package net.accelf.contral.mastodon.models
 
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -21,4 +22,20 @@ internal interface AccountDao {
 
     @Query("SELECT * FROM accounts;")
     suspend fun listAccounts(): List<Account>
+}
+
+internal class PreviewAccountProvider : PreviewParameterProvider<Account> {
+    override val values: Sequence<Account>
+        get() = sequenceOf(
+            Account(
+                domain = "example.domain",
+                id = "1",
+                accessToken = "",
+            ),
+            Account(
+                domain = "example.domain",
+                id = "2",
+                accessToken = "",
+            ),
+        )
 }

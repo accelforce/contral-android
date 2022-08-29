@@ -36,7 +36,11 @@ fun Main() {
             .apply {
                 plugins.forEach { it.renderTimelines(this) }
             }
-        CompositionLocalProvider(LocalTimelines provides timelines) {
+        val timelineAdders = remember { plugins.map(Plugin::timelineAdders).flatten() }
+        CompositionLocalProvider(
+            LocalTimelines provides timelines,
+            LocalTimelineAdders provides timelineAdders,
+        ) {
             ContralTheme {
                 NavHost(navController = navController, startDestination = "navigator") {
                     plugins.forEach { it.renderRoutes.invoke(this) }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
 import androidx.navigation.NavGraphBuilder
 import net.accelf.contral.api.timelines.Timeline
+import net.accelf.contral.api.timelines.TimelineAdder
 
 class PluginResolver(
     private val id: String,
@@ -45,6 +46,14 @@ class PluginResolver(
         timelineRenderers.add(timelineRenderer)
     }
 
+    private val timelineAdders = mutableListOf<TimelineAdder>()
+    fun addTimelineAdder(
+        render: @Composable () -> Unit,
+        onClick: ((String) -> Unit) -> Unit,
+    ) {
+        timelineAdders.add(TimelineAdder(render, onClick))
+    }
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun build() = Plugin(
         id = id,
@@ -58,6 +67,7 @@ class PluginResolver(
         renderTimelines = {
             timelineRenderers.forEach { it.invoke(this) }
         },
+        timelineAdders = timelineAdders,
     )
 }
 

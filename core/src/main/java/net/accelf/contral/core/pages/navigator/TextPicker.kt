@@ -2,7 +2,7 @@ package net.accelf.contral.core.pages.navigator
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +29,7 @@ internal fun <T> TextPicker(
 ) {
     var expanded by useState(false)
 
-    Column(
+    Box(
         modifier = modifier,
     ) {
         val interactionSource = remember { MutableInteractionSource() }

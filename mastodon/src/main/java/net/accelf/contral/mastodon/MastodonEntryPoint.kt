@@ -1,5 +1,6 @@
 package net.accelf.contral.mastodon
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -18,7 +19,7 @@ fun PluginResolver.mastodonPlugin() {
     name = "Mastodon"
     version = 0 minor 0 patch 0
 
-    require("core", 0 minor 3)
+    require("core", 0 minor 4)
 
     inject {
         val context = LocalContext.current
@@ -44,6 +45,11 @@ fun PluginResolver.mastodonPlugin() {
             }
         }
     }
+
+    addTimelineAdder(
+        render = { Text(text = "Login to Mastodon") },
+        onClick = { it("mastodon/accounts/create") },
+    )
 }
 
 internal val LocalMastodonDatabase = staticCompositionLocalOf<MastodonDatabase> {

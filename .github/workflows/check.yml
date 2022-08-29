@@ -65,8 +65,9 @@ jobs:
           script: ./gradlew connectedAndroidTest connectedAndroidTestCollectReports
 
       - uses: actions/upload-artifact@v3
+        if: ${{ always() }}
         with:
-          name: instrument-test-result
+          name: instrument-test-result-${{ matrix.api-level }}
           path: build/outputs/androidTest
 
   lint:

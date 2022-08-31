@@ -1,10 +1,14 @@
 package net.accelf.contral.core
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -16,7 +20,7 @@ import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.core.plugin.resolvePlugins
 
 @Composable
-@OptIn(InternalComposeApi::class)
+@OptIn(InternalComposeApi::class, ExperimentalMaterial3Api::class)
 fun Main() {
     val navController = rememberNavController()
 
@@ -41,8 +45,20 @@ fun Main() {
             LocalTimelineAdders provides timelineAdders,
         ) {
             ContralTheme {
-                NavHost(navController = navController, startDestination = "navigator") {
-                    plugins.forEach { it.renderRoutes.invoke(this) }
+                Scaffold(
+                    topBar = {
+                        AppBar(
+                            navController = navController,
+                        )
+                    },
+                ) { paddingValues ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "timelines",
+                        modifier = Modifier.padding(paddingValues),
+                    ) {
+                        plugins.forEach { it.renderRoutes.invoke(this) }
+                    }
                 }
             }
         }

@@ -68,7 +68,9 @@ private fun ListTimelines(
         },
         sheetState = bottomSheetState,
     ) {
-        Box {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxHeight()

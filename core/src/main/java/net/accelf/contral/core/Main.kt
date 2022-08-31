@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +35,7 @@ fun Main() {
         val values = plugins.map(Plugin::injects).flatten().map { it.invoke() }.toTypedArray()
         currentComposer.startProviders(values)
 
-        val timelines = remember { mutableListOf<Timeline>() }
+        val timelines = remember { mutableStateListOf<Timeline>() }
         (PluginResolver.AddTimelineScope { timelines.add(it) })
             .apply {
                 plugins.forEach { it.renderTimelines(this) }

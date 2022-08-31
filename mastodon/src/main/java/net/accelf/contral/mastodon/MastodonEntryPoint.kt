@@ -2,9 +2,7 @@ package net.accelf.contral.mastodon
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
@@ -12,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.room.Room
-import kotlinx.coroutines.launch
 import net.accelf.contral.api.plugin.MinorVersion.Companion.minor
 import net.accelf.contral.api.plugin.MinorVersion.Companion.patch
 import net.accelf.contral.api.plugin.PluginResolver
@@ -72,14 +69,12 @@ fun PluginResolver.mastodonPlugin() {
 
     addTimelines {
         val db = LocalMastodonDatabase.current
-        val scope = rememberCoroutineScope()
-        SideEffect {
-            scope.launch {
-                db.accountDao().listAccounts()
-                    .forEach {
-                        addTimeline(HomeTimeline(it))
-                    }
-            }
+
+        LaunchedEffect(Unit) {
+            db.accountDao().listAccounts()
+                .forEach {
+                    addTimeline(HomeTimeline(it))
+                }
         }
     }
 

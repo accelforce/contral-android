@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
 import androidx.paging.Pager
@@ -13,6 +14,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import net.accelf.contral.api.timelines.LocalTimeline
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineItem
 
@@ -36,14 +38,18 @@ internal fun ShowTimeline(
             )
         },
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+        CompositionLocalProvider(
+            LocalTimeline provides timeline,
         ) {
-            items(
-                items = pagingItems,
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
             ) {
-                it?.Render()
-                Divider()
+                items(
+                    items = pagingItems,
+                ) {
+                    it?.Render()
+                    Divider()
+                }
             }
         }
     }

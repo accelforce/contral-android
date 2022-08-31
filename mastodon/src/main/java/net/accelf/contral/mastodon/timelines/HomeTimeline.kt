@@ -16,7 +16,7 @@ import net.accelf.contral.mastodon.api.Account as ApiAccount
 import net.accelf.contral.mastodon.models.Account as DBAccount
 
 internal class HomeTimeline(
-    private val dbAccount: DBAccount,
+    val dbAccount: DBAccount,
 ) : Timeline {
 
     private val mastodonApi = MastodonApi.create(dbAccount.domain, dbAccount.accessToken)

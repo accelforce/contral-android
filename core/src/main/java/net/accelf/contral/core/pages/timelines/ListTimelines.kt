@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
-import net.accelf.contral.core.LocalNavController
 import net.accelf.contral.core.LocalTimelineAdders
 import net.accelf.contral.core.LocalTimelines
 

@@ -22,6 +22,9 @@ internal interface AccountDao {
 
     @Query("SELECT * FROM accounts;")
     suspend fun listAccounts(): List<Account>
+
+    @Query("SELECT * FROM accounts WHERE domain = :domain AND id = :id LIMIT 1;")
+    suspend fun getAccount(domain: String, id: String): Account?
 }
 
 internal class PreviewAccountProvider : PreviewParameterProvider<Account> {

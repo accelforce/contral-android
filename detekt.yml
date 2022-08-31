@@ -41,6 +41,8 @@ naming:
     constantPattern: '[A-Z][A-Za-z0-9]*'
 
 style:
+  DestructuringDeclarationWithTooManyEntries:
+    active: false
   ForbiddenComment:
     active: false
   MagicNumber:

@@ -3,6 +3,7 @@ package net.accelf.contral.mastodon.api
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.accelf.contral.mastodon.models.Account as DBAccount
 
 @Serializable
 data class Account(
@@ -11,10 +12,14 @@ data class Account(
     @SerialName("username") val username: String,
     @SerialName("display_name") val nullableDisplayName: String,
     @SerialName("avatar") val avatar: String,
+    @SerialName("header") val header: String,
 ) {
 
     val displayName
         get() = nullableDisplayName.takeUnless(String::isEmpty) ?: username
+
+    internal fun path(sourceAccount: DBAccount) = path(sourceAccount.domain, sourceAccount.id)
+    private fun path(domain: String, sourceId: String?) = "mastodon/accounts/$domain/$id?sourceId=$sourceId"
 }
 
 internal class PreviewAccountProvider : PreviewParameterProvider<Account> {
@@ -26,6 +31,7 @@ internal class PreviewAccountProvider : PreviewParameterProvider<Account> {
                 username = "test",
                 avatar = "https://robohash.org/sample.png?set=set4",
                 nullableDisplayName = "Test",
+                header = "https://picsum.photos/200/300",
             ),
             Account(
                 id = "234567890234567890",
@@ -33,6 +39,7 @@ internal class PreviewAccountProvider : PreviewParameterProvider<Account> {
                 username = "announcement",
                 avatar = "https://robohash.org/sample.png?set=set4",
                 nullableDisplayName = "",
+                header = "https://picsum.photos/200/300",
             ),
         )
 }

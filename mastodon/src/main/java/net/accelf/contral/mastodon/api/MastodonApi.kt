@@ -6,9 +6,13 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.create
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MastodonApi {
+    @GET("/api/v1/accounts/{id}")
+    suspend fun getAccount(@Path("id") id: String): NetworkResult<Account>
+
     @GET("/api/v1/accounts/verify_credentials")
     suspend fun getSelfAccount(): NetworkResult<Account>
 
@@ -20,16 +24,19 @@ interface MastodonApi {
     ): NetworkResult<List<Status>>
 
     companion object {
-        internal fun create(domain: String, accessToken: String): MastodonApi = retrofitBuilder
+        internal fun create(domain: String, accessToken: String?): MastodonApi = retrofitBuilder
             .client(
-                OkHttpClient.Builder()
-                    .addInterceptor {
-                        val request = it.request().newBuilder()
-                            .addHeader("Authorization", "Bearer $accessToken")
-                            .build()
-                        it.proceed(request)
+                OkHttpClient.Builder().apply {
+                    accessToken?.let {
+                        addInterceptor {
+                            val request = it.request().newBuilder()
+                                .addHeader("Authorization", "Bearer $accessToken")
+                                .build()
+                            it.proceed(request)
+                        }
                     }
-                    .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
+                    addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
+                }
                     .build(),
             )
             .baseUrl(

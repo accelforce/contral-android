@@ -1,5 +1,6 @@
 package net.accelf.contral.mastodon.api
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -21,8 +22,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.accelf.contral.api.timelines.LocalTimeline
 import net.accelf.contral.api.timelines.TimelineItem
+import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
+import net.accelf.contral.mastodon.timelines.HomeTimeline
 import net.accelf.contral.mastodon.ui.Html
 import net.accelf.contral.mastodon.ui.HtmlAnnotations
 import net.accelf.contral.mastodon.ui.HtmlText
@@ -38,6 +42,12 @@ data class Status(
     @Composable
     override fun Render() {
         val uriHandler = LocalUriHandler.current
+        val navController = LocalNavController.current
+        val timeline = LocalTimeline.current as HomeTimeline
+
+        val openAccount = {
+            navController.navigate(account.path(timeline.dbAccount))
+        }
 
         if (boostedStatus != null) {
             Column {
@@ -56,18 +66,22 @@ data class Status(
                         contentDescription = account.acct,
                         modifier = Modifier
                             .size(24.dp)
-                            .padding(2.dp),
+                            .padding(2.dp)
+                            .clickable { openAccount() },
                     )
 
                     Text(
                         text = account.displayName,
+                        modifier = Modifier.clickable { openAccount() },
                         maxLines = 1,
                         style = MaterialTheme.typography.titleSmall,
                     )
 
                     Text(
                         text = "@${account.acct}",
-                        modifier = Modifier.padding(start = 4.dp),
+                        modifier = Modifier
+                            .padding(start = 4.dp)
+                            .clickable { openAccount() },
                         maxLines = 1,
                         style = MaterialTheme.typography.labelSmall,
                     )
@@ -82,12 +96,14 @@ data class Status(
                     contentDescription = account.acct,
                     modifier = Modifier
                         .size(48.dp)
-                        .padding(2.dp),
+                        .padding(2.dp)
+                        .clickable { openAccount() },
                 )
 
                 Column {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { openAccount() },
                     ) {
                         Text(
                             text = account.displayName,

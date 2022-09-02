@@ -54,16 +54,23 @@ private fun ListTimelines(
 
     ModalBottomSheetLayout(
         sheetContent = {
-            timelineAdders.forEach { timelineAdder ->
+            if (timelineAdders.isEmpty()) {
                 DropdownMenuItem(
-                    text = timelineAdder.render,
-                    onClick = {
-                        scope.launch {
-                            bottomSheetState.hide()
-                            timelineAdder.onClick(navigate)
-                        }
-                    },
+                    text = { Text(text = "No timeline adders found") },
+                    onClick = {},
                 )
+            } else {
+                timelineAdders.forEach { timelineAdder ->
+                    DropdownMenuItem(
+                        text = timelineAdder.render,
+                        onClick = {
+                            scope.launch {
+                                bottomSheetState.hide()
+                                timelineAdder.onClick(navigate)
+                            }
+                        },
+                    )
+                }
             }
         },
         sheetState = bottomSheetState,

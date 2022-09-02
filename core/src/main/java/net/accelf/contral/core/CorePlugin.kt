@@ -18,7 +18,7 @@ import net.accelf.contral.core.pages.timelines.ShowTimeline
 
 internal fun PluginResolver.corePlugin() {
     name = "Contral Core"
-    version = 0 minor 5 patch 0
+    version = 0 minor 6 patch 0
 
     addRoutes {
         composable("navigator") { NavigatorPage() }

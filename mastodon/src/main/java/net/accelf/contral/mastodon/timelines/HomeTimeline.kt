@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import at.connyduck.calladapter.networkresult.onSuccess
+import net.accelf.contral.api.composers.Composer
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.ui.utils.useState
+import net.accelf.contral.mastodon.MastodonComposer
 import net.accelf.contral.mastodon.api.MastodonApi
 import net.accelf.contral.mastodon.api.Account as ApiAccount
 import net.accelf.contral.mastodon.models.Account as DBAccount
@@ -28,6 +30,8 @@ internal class HomeTimeline(
             )
         }
     }
+
+    override fun composer(): Composer = MastodonComposer(mastodonApi)
 
     @Composable
     override fun Render() {

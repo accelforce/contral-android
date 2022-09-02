@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import net.accelf.contral.api.composers.Composer
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
 import net.accelf.contral.api.ui.LocalNavController
@@ -133,6 +134,8 @@ private fun PreviewListTimelines() {
     val timelines = List(30) {
         object : Timeline {
             override fun pager() = throw NotImplementedError()
+
+            override fun composer(): Composer = DummyComposer
 
             @Composable
             override fun Render() {

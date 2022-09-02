@@ -5,7 +5,10 @@ import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.create
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -22,6 +25,12 @@ interface MastodonApi {
         @Query("min_id") minId: String? = null,
         @Query("max_id") maxId: String? = null,
     ): NetworkResult<List<Status>>
+
+    @POST("/api/v1/statuses")
+    @FormUrlEncoded
+    suspend fun postStatus(
+        @Field("status") content: String,
+    ): NetworkResult<Status>
 
     companion object {
         internal fun create(domain: String, accessToken: String?): MastodonApi = retrofitBuilder

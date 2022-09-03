@@ -55,7 +55,7 @@ data class Status(
 
         Render(
             openAccount = {
-                navController.navigate(account.path(timeline.dbAccount))
+                navController.navigate(it.path(timeline.dbAccount))
             },
         )
     }

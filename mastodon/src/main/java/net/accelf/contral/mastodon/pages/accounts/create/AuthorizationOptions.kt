@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import at.connyduck.calladapter.networkresult.onFailure
 import at.connyduck.calladapter.networkresult.onSuccess
-import at.connyduck.calladapter.networkresult.runCatching
 import kotlinx.coroutines.launch
+import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.LocalMastodonDatabase
@@ -67,6 +67,7 @@ private suspend fun authorize(
     db: MastodonDatabase,
     application: Application,
     code: String,
+    onComplete: (Account) -> Unit,
 ) {
     val token = authApi
         .getToken(
@@ -83,14 +84,18 @@ private suspend fun authorize(
     mastodonApi.getSelfAccount()
         .onSuccess {
             runCatching {
-                db.accountDao().insert(
-                    Account(
-                        domain = domain,
-                        id = it.id,
-                        accessToken = token.accessToken,
-                    ),
+                Account(
+                    domain = domain,
+                    id = it.id,
+                    accessToken = token.accessToken,
                 )
+                    .also {
+                        db.accountDao().insert(it)
+                    }
             }
+                .onSuccess {
+                    onComplete(it)
+                }
                 .onFailure {
                     error("This account is already registered")
                 }
@@ -107,6 +112,7 @@ internal fun AuthorizationOptions(
     val authApi: AuthApi = remember { createAuthApi(domain) }
     val db = LocalMastodonDatabase.current
     val uriHandler = LocalUriHandler.current
+    val navController = LocalNavController.current
     var application: Application? by useState(null)
 
     CodeAuthorization(
@@ -127,10 +133,17 @@ internal fun AuthorizationOptions(
                 }
         },
         showCodeField = application != null,
-        onCodeSubmit = { code ->
-            authorize(domain, authApi, db, application!!, code)
-        },
-    )
+    ) { code ->
+        authorize(
+            domain,
+            authApi,
+            db,
+            application!!,
+            code,
+        ) {
+            navController.navigate("timelines")
+        }
+    }
 }
 
 @Composable

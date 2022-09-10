@@ -7,9 +7,10 @@ class MastodonComposer(
     private val mastodonApi: MastodonApi,
 ) : Composer {
     override suspend fun compose(content: String): Boolean =
-        mastodonApi
-            .postStatus(
-                content = content,
-            )
-            .isSuccess
+        runCatching {
+            mastodonApi
+                .postStatus(
+                    content = content,
+                )
+        }.isSuccess
 }

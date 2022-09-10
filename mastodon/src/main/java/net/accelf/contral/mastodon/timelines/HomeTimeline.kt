@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import at.connyduck.calladapter.networkresult.onSuccess
 import net.accelf.contral.api.composers.Composer
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.ui.utils.useState
@@ -38,8 +37,7 @@ internal class HomeTimeline(
         var apiAccount by useState<ApiAccount?>(null)
 
         LaunchedEffect(Unit) {
-            mastodonApi.getSelfAccount()
-                .onSuccess { apiAccount = it }
+            apiAccount = mastodonApi.getSelfAccount()
         }
 
         RenderTimeline(

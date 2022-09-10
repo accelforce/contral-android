@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import at.connyduck.calladapter.networkresult.onSuccess
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -48,10 +47,7 @@ internal fun ShowAccountPage(
 
     val loadAccount = suspend {
         loading = true
-        mastodonApi.getAccount(id)
-            .onSuccess {
-                account = it
-            }
+        account = mastodonApi.getAccount(id)
         loading = false
     }
 
@@ -61,7 +57,7 @@ internal fun ShowAccountPage(
 
     LaunchedEffect(mastodonApi.hashCode()) {
         sourceApiAccount = sourceDBAccount?.let {
-            mastodonApi.getSelfAccount().getOrNull()
+            mastodonApi.getSelfAccount()
         }
     }
 

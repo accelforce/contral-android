@@ -21,8 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import at.connyduck.calladapter.networkresult.onFailure
-import at.connyduck.calladapter.networkresult.onSuccess
 import kotlinx.coroutines.launch
 import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
@@ -67,8 +65,7 @@ private suspend fun authorize(
     db: MastodonDatabase,
     application: Application,
     code: String,
-    onComplete: (Account) -> Unit,
-) {
+): Account {
     val token = authApi
         .getToken(
             clientId = application.clientId,
@@ -78,31 +75,16 @@ private suspend fun authorize(
             scope = SCOPES,
             code = code,
         )
-        .getOrNull() ?: error("failed to get token")
 
     val mastodonApi = MastodonApi.create(domain, token.accessToken)
-    mastodonApi.getSelfAccount()
-        .onSuccess {
-            runCatching {
-                Account(
-                    domain = domain,
-                    id = it.id,
-                    accessToken = token.accessToken,
-                )
-                    .also {
-                        db.accountDao().insert(it)
-                    }
-            }
-                .onSuccess {
-                    onComplete(it)
-                }
-                .onFailure {
-                    error("This account is already registered")
-                }
-        }
-        .onFailure {
-            throw it
-        }
+    val apiAccount = mastodonApi.getSelfAccount()
+    val dbAccount = Account(
+        domain = domain,
+        id = apiAccount.id,
+        accessToken = token.accessToken,
+    )
+    db.accountDao().insert(dbAccount)
+    return dbAccount
 }
 
 @Composable
@@ -117,20 +99,14 @@ internal fun AuthorizationOptions(
 
     CodeAuthorization(
         onStart = {
-            authApi
+            application = authApi
                 .createApp(
                     clientName = "Contral: Mastodon Plugin",
                     redirectUris = "urn:ietf:wg:oauth:2.0:oob",
                     scopes = SCOPES,
                     website = "https://accelf.net/contral",
                 )
-                .onSuccess {
-                    application = it
-                    uriHandler.openUri(authorizeUrl(domain, it))
-                }
-                .onFailure {
-                    println(it)
-                }
+            uriHandler.openUri(authorizeUrl(domain, application!!))
         },
         showCodeField = application != null,
     ) { code ->
@@ -140,9 +116,8 @@ internal fun AuthorizationOptions(
             db,
             application!!,
             code,
-        ) {
-            navController.navigate("timelines")
-        }
+        )
+        navController.navigate("timelines")
     }
 }
 

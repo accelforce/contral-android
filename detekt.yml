@@ -49,6 +49,9 @@ style:
     active: false
   ForbiddenComment:
     active: false
+  ForbiddenImport:
+    active: true
+    forbiddenPatterns: 'androidx\.compose\.material\.(?!icons)'
   MagicNumber:
     active: false
   MaxLineLength:

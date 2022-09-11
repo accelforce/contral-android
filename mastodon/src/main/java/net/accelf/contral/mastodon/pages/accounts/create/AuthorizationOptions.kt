@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import net.accelf.contral.api.ui.LocalNavController
+import net.accelf.contral.api.ui.LocalRegisterTimeline
 import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.LocalMastodonDatabase
@@ -32,6 +33,7 @@ import net.accelf.contral.mastodon.api.AuthApi
 import net.accelf.contral.mastodon.api.MastodonApi
 import net.accelf.contral.mastodon.api.retrofitBuilder
 import net.accelf.contral.mastodon.models.Account
+import net.accelf.contral.mastodon.timelines.HomeTimeline
 import okhttp3.HttpUrl
 import retrofit2.create
 
@@ -95,6 +97,7 @@ internal fun AuthorizationOptions(
     val db = LocalMastodonDatabase.current
     val uriHandler = LocalUriHandler.current
     val navController = LocalNavController.current
+    val registerTimeline = LocalRegisterTimeline.current
     var application: Application? by useState(null)
 
     CodeAuthorization(
@@ -110,13 +113,14 @@ internal fun AuthorizationOptions(
         },
         showCodeField = application != null,
     ) { code ->
-        authorize(
+        val account = authorize(
             domain,
             authApi,
             db,
             application!!,
             code,
         )
+        registerTimeline(HomeTimeline(domain, account.id))
         navController.navigate("timelines")
     }
 }

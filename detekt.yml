@@ -19,6 +19,10 @@ complexity:
   NestedBlockDepth:
     active: false
 
+empty-blocks:
+  EmptyFunctionBlock:
+    ignoreOverridden: true
+
 formatting:
   autoCorrect: false
   FinalNewline:

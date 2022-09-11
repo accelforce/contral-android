@@ -1,14 +1,19 @@
 package net.accelf.contral.api.timelines
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.paging.Pager
 import net.accelf.contral.api.composers.Composer
 
 interface Timeline {
-    fun pager(): Pager<*, out TimelineItem>
+    @Composable
+    @SuppressLint("ComposableNaming")
+    fun getPager(setPager: (Pager<*, out TimelineItem>) -> Unit)
 
-    fun composer(): Composer
+    @Composable
+    @SuppressLint("ComposableNaming")
+    fun getComposer(setComposer: (Composer) -> Unit)
 
     @Composable
     fun Render()

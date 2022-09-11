@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,18 +26,42 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import net.accelf.contral.api.composers.Composer
 import net.accelf.contral.api.timelines.LocalTimeline
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.utils.useState
 
-@Suppress("UNCHECKED_CAST")
+@Composable
+internal fun ShowTimelinePage(
+    timeline: Timeline,
+) {
+    var pager by useState<Pager<*, TimelineItem>?>(null)
+
+    timeline.getPager {
+        @Suppress("UNCHECKED_CAST")
+        pager = it as Pager<*, TimelineItem>
+    }
+
+    CompositionLocalProvider(
+        LocalTimeline provides timeline,
+    ) {
+        pager?.let {
+            ShowTimeline(
+                timeline = timeline,
+                pager = pager!!,
+            )
+        }
+    }
+}
+
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 internal fun ShowTimeline(
     timeline: Timeline,
+    pager: Pager<*, TimelineItem>,
 ) {
-    val pagingItems = (timeline.pager() as Pager<*, TimelineItem>).flow.collectAsLazyPagingItems()
+    val pagingItems = pager.flow.collectAsLazyPagingItems()
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = false),
@@ -53,57 +76,57 @@ internal fun ShowTimeline(
             )
         },
     ) {
-        CompositionLocalProvider(
-            LocalTimeline provides timeline,
-        ) {
-            BoxWithConstraints {
-                val state = rememberBottomSheetScaffoldState()
-                var min by useState(0.dp)
-                val max = maxHeight
-                val height = run {
-                    val ratio = state.bottomSheetState.progress.fraction
-                    when (state.bottomSheetState.progress.from) {
-                        BottomSheetValue.Collapsed -> when (state.bottomSheetState.progress.to) {
-                            BottomSheetValue.Collapsed -> min
-                            BottomSheetValue.Expanded -> {
-                                min * (1 - ratio) + max * ratio
-                            }
-                        }
-                        BottomSheetValue.Expanded -> when (state.bottomSheetState.progress.to) {
-                            BottomSheetValue.Collapsed -> {
-                                min * ratio + max * (1 - ratio)
-                            }
-                            BottomSheetValue.Expanded -> max
+        BoxWithConstraints {
+            val state = rememberBottomSheetScaffoldState()
+            var min by useState(0.dp)
+            val max = maxHeight
+            val height = run {
+                val ratio = state.bottomSheetState.progress.fraction
+                when (state.bottomSheetState.progress.from) {
+                    BottomSheetValue.Collapsed -> when (state.bottomSheetState.progress.to) {
+                        BottomSheetValue.Collapsed -> min
+                        BottomSheetValue.Expanded -> {
+                            min * (1 - ratio) + max * ratio
                         }
                     }
+                    BottomSheetValue.Expanded -> when (state.bottomSheetState.progress.to) {
+                        BottomSheetValue.Collapsed -> {
+                            min * ratio + max * (1 - ratio)
+                        }
+                        BottomSheetValue.Expanded -> max
+                    }
                 }
+            }
 
-                BottomSheetScaffold(
-                    sheetContent = {
-                        Box(modifier = Modifier.height(height)) {
-                            Composer(
-                                setMinHeight = { min = it },
-                                composer = remember { runCatching { timeline.composer() }.getOrDefault(DummyComposer) },
-                            )
-                        }
-                        Box(modifier = Modifier.height(max - height))
-                    },
-                    scaffoldState = state,
-                    sheetShape = MaterialTheme.shapes.small,
-                    sheetPeekHeight = min,
-                    sheetBackgroundColor = MaterialTheme.colorScheme.surface,
-                ) { paddingValues ->
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues),
+            var composer by useState<Composer>(DummyComposer)
+            timeline.getComposer {
+                composer = it
+            }
+            BottomSheetScaffold(
+                sheetContent = {
+                    Box(modifier = Modifier.height(height)) {
+                        Composer(
+                            setMinHeight = { min = it },
+                            composer = composer,
+                        )
+                    }
+                    Box(modifier = Modifier.height(max - height))
+                },
+                scaffoldState = state,
+                sheetShape = MaterialTheme.shapes.small,
+                sheetPeekHeight = min,
+                sheetBackgroundColor = MaterialTheme.colorScheme.surface,
+            ) { paddingValues ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                ) {
+                    items(
+                        items = pagingItems,
                     ) {
-                        items(
-                            items = pagingItems,
-                        ) {
-                            it?.Render()
-                            Divider()
-                        }
+                        it?.Render()
+                        Divider()
                     }
                 }
             }

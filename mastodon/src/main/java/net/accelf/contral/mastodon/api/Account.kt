@@ -3,7 +3,6 @@ package net.accelf.contral.mastodon.api
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.accelf.contral.mastodon.models.Account as DBAccount
 
 @Serializable
 data class Account(
@@ -18,8 +17,7 @@ data class Account(
     val displayName
         get() = nullableDisplayName.takeUnless(String::isEmpty) ?: username
 
-    internal fun path(sourceAccount: DBAccount) = path(sourceAccount.domain, sourceAccount.id)
-    private fun path(domain: String, sourceId: String?) = "mastodon/accounts/$domain/$id?sourceId=$sourceId"
+    fun path(domain: String, sourceId: String?) = "mastodon/accounts/$domain/$id?sourceId=$sourceId"
 }
 
 internal class PreviewAccountProvider : PreviewParameterProvider<Account> {

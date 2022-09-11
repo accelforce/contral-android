@@ -1,5 +1,8 @@
 package net.accelf.contral.core
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -10,31 +13,52 @@ import net.accelf.contral.api.plugin.Plugin
 import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.core.pages.Greeting
 import net.accelf.contral.core.pages.navigator.NavigatorPage
 import net.accelf.contral.core.pages.plugins.PluginsPage
 import net.accelf.contral.core.pages.timelines.ListTimelinesPage
-import net.accelf.contral.core.pages.timelines.ShowTimeline
+import net.accelf.contral.core.pages.timelines.ShowTimelinePage
+import net.accelf.contral.core.pages.timelines.TimelineController
 
 internal fun PluginResolver.corePlugin() {
     name = "Contral Core"
-    version = 0 minor 6 patch 0
+    version = 0 minor 7 patch 0
+
+    addDatabase(LocalContralDatabase)
 
     addRoutes {
         composable("navigator") { NavigatorPage() }
         composable("greetings") { Greeting(name = "Contral") }
         composable("plugins") { PluginsPage() }
         composable("timelines") { ListTimelinesPage() }
-        composable("timelines/{id}", listOf(navArgument("id") { type = NavType.IntType })) {
-            val timelines = LocalTimelines.current
-            val id = it.arguments!!.getInt("id")
-            ShowTimeline(timelines[id])
+        composable("timelines/{id}", listOf(navArgument("id") { type = NavType.LongType })) {
+            val db = LocalContralDatabase.current
+            val timelineController = LocalTimelineController.current
+            var timeline by useState<Timeline?>(null)
+            val id = it.arguments!!.getLong("id")
+
+            LaunchedEffect(db.hashCode(), id) {
+                val savedTimeline = db.savedTimelineDao().getSavedTimeline(id)!!
+                timeline = timelineController.getTimeline(savedTimeline.params)
+            }
+
+            timeline?.let {
+                ShowTimelinePage(
+                    timeline = timeline!!,
+                )
+            }
         }
     }
 }
 
 internal val LocalPlugins = staticCompositionLocalOf<List<Plugin>> { error("LocalPlugins is not set") }
-internal val LocalTimelines = staticCompositionLocalOf<List<Timeline>> { error("LocalTimelines is not set") }
+internal val LocalTimelineController = staticCompositionLocalOf<TimelineController> {
+    error("LocalTimelineController is not set")
+}
 internal val LocalTimelineAdders = staticCompositionLocalOf<List<TimelineAdder>> {
     error("LocalTimelineAdders is not set")
+}
+internal val LocalContralDatabase = staticCompositionLocalOf<ContralDatabase> {
+    error("LocalContralDatabase is not set")
 }

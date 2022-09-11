@@ -5,11 +5,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.room.Room
 import net.accelf.contral.api.plugin.MinorVersion.Companion.minor
 import net.accelf.contral.api.plugin.MinorVersion.Companion.patch
 import net.accelf.contral.api.plugin.PluginResolver
@@ -24,15 +22,9 @@ fun PluginResolver.mastodonPlugin() {
     name = "Mastodon"
     version = 0 minor 0 patch 0
 
-    require("core", 0 minor 6)
+    require("core", 0 minor 7)
 
-    inject {
-        val context = LocalContext.current
-        val db = Room
-            .databaseBuilder(context, MastodonDatabase::class.java, "net.accelf.contral.mastodon.MastodonDatabase")
-            .build()
-        LocalMastodonDatabase provides db
-    }
+    addDatabase(LocalMastodonDatabase)
 
     addRoutes {
         composable("mastodon/accounts/create") { CreateAccountPage() }
@@ -67,16 +59,7 @@ fun PluginResolver.mastodonPlugin() {
         }
     }
 
-    addTimelines {
-        val db = LocalMastodonDatabase.current
-
-        LaunchedEffect(Unit) {
-            db.accountDao().listAccounts()
-                .forEach {
-                    addTimeline(HomeTimeline(it))
-                }
-        }
-    }
+    addTimeline(HomeTimeline::class)
 
     addTimelineAdder(
         render = { Text(text = "Login to Mastodon") },

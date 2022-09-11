@@ -7,17 +7,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import net.accelf.contral.api.plugin.Plugin
-import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.ui.LocalNavController
+import net.accelf.contral.api.ui.LocalRegisterTimeline
 import net.accelf.contral.api.ui.theme.ContralTheme
+import net.accelf.contral.core.models.SavedTimeline
+import net.accelf.contral.core.pages.timelines.TimelineController
 import net.accelf.contral.core.plugin.resolvePlugins
 
 @Composable
@@ -35,15 +36,16 @@ fun Main() {
         val values = plugins.map(Plugin::injects).flatten().map { it.invoke() }.toTypedArray()
         currentComposer.startProviders(values)
 
-        val timelines = remember { mutableStateListOf<Timeline>() }
-        (PluginResolver.AddTimelineScope { timelines.add(it) })
-            .apply {
-                plugins.forEach { it.renderTimelines(this) }
-            }
+        val timelineController = remember { TimelineController(plugins.map(Plugin::timelines).flatten()) }
         val timelineAdders = remember { plugins.map(Plugin::timelineAdders).flatten() }
+        val contralDatabase = LocalContralDatabase.current
+        suspend fun registerTimeline(timeline: Timeline) =
+            contralDatabase.savedTimelineDao()
+                .insert(SavedTimeline(params = timelineController.paramsToString(timeline)))
         CompositionLocalProvider(
-            LocalTimelines provides timelines,
+            LocalTimelineController provides timelineController,
             LocalTimelineAdders provides timelineAdders,
+            LocalRegisterTimeline provides ::registerTimeline,
         ) {
             ContralTheme {
                 Scaffold(

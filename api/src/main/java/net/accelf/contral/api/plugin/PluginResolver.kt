@@ -2,10 +2,16 @@ package net.accelf.contral.api.plugin
 
 import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ProvidedValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import kotlin.reflect.KClass
 
 class PluginResolver(
     private val id: String,
@@ -32,18 +38,24 @@ class PluginResolver(
         injects.add(getValue)
     }
 
+    inline fun <reified T : RoomDatabase> addDatabase(compositionLocal: ProvidableCompositionLocal<T>) {
+        inject {
+            val context = LocalContext.current
+            val db = remember {
+                Room.databaseBuilder(context, T::class.java, T::class.qualifiedName!!).build()
+            }
+            compositionLocal provides db
+        }
+    }
+
     private val routeRenderers = mutableListOf<(NavGraphBuilder).() -> Unit>()
     fun addRoutes(routeRenderer: (NavGraphBuilder).() -> Unit) {
         routeRenderers.add(routeRenderer)
     }
 
-    fun interface AddTimelineScope {
-        fun addTimeline(timeline: Timeline)
-    }
-
-    private val timelineRenderers = mutableListOf<@Composable TimelineRenderer>()
-    fun addTimelines(timelineRenderer: @Composable TimelineRenderer) {
-        timelineRenderers.add(timelineRenderer)
+    private val timelines = mutableListOf<KClass<*>>()
+    fun <T : Timeline> addTimeline(timelineParams: KClass<T>) {
+        timelines.add(timelineParams)
     }
 
     private val timelineAdders = mutableListOf<TimelineAdder>()
@@ -64,11 +76,7 @@ class PluginResolver(
         renderRoutes = {
             routeRenderers.forEach { it.invoke(this) }
         },
-        renderTimelines = {
-            timelineRenderers.forEach { it.invoke(this) }
-        },
+        timelines = timelines,
         timelineAdders = timelineAdders,
     )
 }
-
-typealias TimelineRenderer = (PluginResolver.AddTimelineScope).() -> Unit

@@ -1,5 +1,6 @@
 package net.accelf.contral.core.pages.timelines
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,29 +16,36 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.paging.Pager
 import kotlinx.coroutines.launch
 import net.accelf.contral.api.composers.Composer
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
+import net.accelf.contral.core.LocalContralDatabase
 import net.accelf.contral.core.LocalTimelineAdders
-import net.accelf.contral.core.LocalTimelines
+import net.accelf.contral.core.LocalTimelineController
 
 @Composable
 internal fun ListTimelinesPage() {
-    val timelines = LocalTimelines.current
+    val db = LocalContralDatabase.current
+    val timelineController = LocalTimelineController.current
+    val savedTimelines by db.savedTimelineDao().listSavedTimelines().collectAsState(emptyList())
     val timelineAdders = LocalTimelineAdders.current
     val navController = LocalNavController.current
 
     ListTimelines(
-        timelines = timelines,
+        timelines = savedTimelines.map { it.id to timelineController.getTimeline(it.params) },
         timelineAdders = timelineAdders,
         navigate = navController::navigate,
     )
@@ -46,7 +54,7 @@ internal fun ListTimelinesPage() {
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 private fun ListTimelines(
-    timelines: List<Timeline>,
+    timelines: List<Pair<Long, Timeline>>,
     timelineAdders: List<TimelineAdder>,
     navigate: (String) -> Unit,
 ) {
@@ -84,7 +92,7 @@ private fun ListTimelines(
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState()),
             ) {
-                timelines.forEachIndexed { i, timeline ->
+                timelines.forEach { (i, timeline) ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -132,10 +140,14 @@ internal class PreviewTimelineAdderProvider : PreviewParameterProvider<TimelineA
 @Preview(heightDp = 320)
 private fun PreviewListTimelines() {
     val timelines = List(30) {
-        object : Timeline {
-            override fun pager() = throw NotImplementedError()
+        it.toLong() to object : Timeline {
+            @Composable
+            @SuppressLint("ComposableNaming")
+            override fun getPager(setPager: (Pager<*, out TimelineItem>) -> Unit) {}
 
-            override fun composer(): Composer = DummyComposer
+            @Composable
+            @SuppressLint("ComposableNaming")
+            override fun getComposer(setComposer: (Composer) -> Unit) {}
 
             @Composable
             override fun Render() {

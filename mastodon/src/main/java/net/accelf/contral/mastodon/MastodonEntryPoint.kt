@@ -15,6 +15,7 @@ import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.models.Account
 import net.accelf.contral.mastodon.pages.accounts.create.CreateAccountPage
 import net.accelf.contral.mastodon.pages.accounts.show.ShowAccountPage
+import net.accelf.contral.mastodon.pages.timelines.create.CreateTimelinePage
 import net.accelf.contral.mastodon.timelines.HomeTimeline
 
 @Suppress("unused")
@@ -57,13 +58,15 @@ fun PluginResolver.mastodonPlugin() {
                 sourceDBAccount = sourceAccount,
             )
         }
+
+        composable("mastodon/timelines/create") { CreateTimelinePage() }
     }
 
     addTimeline(HomeTimeline::class)
 
     addTimelineAdder(
-        render = { Text(text = "Login to Mastodon") },
-        onClick = { it("mastodon/accounts/create") },
+        render = { Text(text = "Add a Mastodon timeline") },
+        onClick = { it("mastodon/timelines/create") },
     )
 }
 

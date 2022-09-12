@@ -7,18 +7,25 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
+import net.accelf.contral.mastodon.api.MastodonApi
 
 @Entity(tableName = "accounts", primaryKeys = ["domain", "id"])
 internal data class Account(
     @ColumnInfo(name = "domain") val domain: String,
     @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "access_token") val accessToken: String,
-)
+) {
+    internal val mastodonApi by lazy { MastodonApi.create(domain, accessToken) }
+}
 
 @Dao
 internal interface AccountDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(vararg accounts: Account)
+
+    @Query("SELECT * FROM accounts;")
+    fun listAccounts(): Flow<List<Account>>
 
     @Query("SELECT * FROM accounts WHERE domain = :domain AND id = :id LIMIT 1;")
     suspend fun getAccount(domain: String, id: String): Account?

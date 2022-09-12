@@ -15,7 +15,6 @@ import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.LocalMastodonDatabase
 import net.accelf.contral.mastodon.MastodonComposer
-import net.accelf.contral.mastodon.api.MastodonApi
 import net.accelf.contral.mastodon.api.Account as ApiAccount
 import net.accelf.contral.mastodon.models.Account as DBAccount
 
@@ -33,7 +32,7 @@ internal class HomeTimeline(
 
         LaunchedEffect(Unit) {
             val account = db.accountDao().getAccount(domain, id)!!
-            val mastodonApi = MastodonApi.create(account.domain, account.accessToken)
+            val mastodonApi = account.mastodonApi
 
             setPager(
                 Pager(PagingConfig(20)) {
@@ -56,8 +55,7 @@ internal class HomeTimeline(
 
         LaunchedEffect(Unit) {
             val account = db.accountDao().getAccount(domain, id)!!
-            val mastodonApi = MastodonApi.create(account.domain, account.accessToken)
-            setComposer(MastodonComposer(mastodonApi))
+            setComposer(MastodonComposer(account.mastodonApi))
         }
     }
 
@@ -69,8 +67,7 @@ internal class HomeTimeline(
 
         LaunchedEffect(Unit) {
             dbAccount = db.accountDao().getAccount(domain, id)
-            val mastodonApi = MastodonApi.create(dbAccount!!.domain, dbAccount!!.accessToken)
-            apiAccount = mastodonApi.getSelfAccount()
+            apiAccount = dbAccount!!.mastodonApi.getSelfAccount()
         }
 
         dbAccount?.let {

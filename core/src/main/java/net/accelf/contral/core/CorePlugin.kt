@@ -14,8 +14,6 @@ import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
 import net.accelf.contral.api.ui.utils.useState
-import net.accelf.contral.core.pages.Greeting
-import net.accelf.contral.core.pages.navigator.NavigatorPage
 import net.accelf.contral.core.pages.plugins.PluginsPage
 import net.accelf.contral.core.pages.timelines.ListTimelinesPage
 import net.accelf.contral.core.pages.timelines.ShowTimelinePage
@@ -28,8 +26,6 @@ internal fun PluginResolver.corePlugin() {
     addDatabase(LocalContralDatabase)
 
     addRoutes {
-        composable("navigator") { NavigatorPage() }
-        composable("greetings") { Greeting(name = "Contral") }
         composable("plugins") { PluginsPage() }
         composable("timelines") { ListTimelinesPage() }
         composable("timelines/{id}", listOf(navArgument("id") { type = NavType.LongType })) {

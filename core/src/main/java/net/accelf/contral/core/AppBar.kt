@@ -48,14 +48,6 @@ internal fun AppBar(
                         menuExpanded = false
                     },
                 )
-
-                DropdownMenuItem(
-                    text = { Text(text = "Navigator") },
-                    onClick = {
-                        navController.navigate("navigator")
-                        menuExpanded = false
-                    },
-                )
             }
         },
     )

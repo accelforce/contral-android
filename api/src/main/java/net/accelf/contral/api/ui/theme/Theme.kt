@@ -1,9 +1,13 @@
+@file:Suppress("ForbiddenImport")
+
 package net.accelf.contral.api.ui.theme
 
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -14,6 +18,17 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.compose.material3.MaterialTheme as Material3Theme
+
+private val DarkColors = darkColors(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+)
+
+private val LightColors = lightColors(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+)
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -61,9 +76,14 @@ fun ContralTheme(
         }
     }
 
-    MaterialTheme(
+    Material3Theme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content,
-    )
+    ) {
+        MaterialTheme(
+            colors = if (darkTheme) DarkColors else LightColors,
+        ) {
+            content()
+        }
+    }
 }

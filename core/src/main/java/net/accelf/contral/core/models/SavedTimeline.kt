@@ -25,4 +25,7 @@ internal interface SavedTimelineDao {
 
     @Query("SELECT * FROM saved_timelines WHERE id = :id;")
     suspend fun getSavedTimeline(id: Long): SavedTimeline?
+
+    @Query("DELETE FROM saved_timelines WHERE id = :id;")
+    suspend fun delete(id: Long)
 }

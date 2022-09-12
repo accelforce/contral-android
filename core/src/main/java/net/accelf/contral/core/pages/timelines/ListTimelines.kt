@@ -3,7 +3,8 @@
 package net.accelf.contral.core.pages.timelines
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,13 +15,20 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +42,7 @@ import net.accelf.contral.api.timelines.TimelineAdder
 import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
+import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.core.LocalContralDatabase
 import net.accelf.contral.core.LocalTimelineAdders
 import net.accelf.contral.core.LocalTimelineController
@@ -47,25 +56,63 @@ internal fun ListTimelinesPage() {
     val navController = LocalNavController.current
 
     ListTimelines(
-        timelines = savedTimelines.map { it.id to timelineController.getTimeline(it.params) },
+        timelines = savedTimelines.associate { it.id to timelineController.getTimeline(it.params) },
         timelineAdders = timelineAdders,
+        removeTimeline = db.savedTimelineDao()::delete,
         navigate = navController::navigate,
     )
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 private fun ListTimelines(
-    timelines: List<Pair<Long, Timeline>>,
+    timelines: Map<Long, Timeline>,
     timelineAdders: List<TimelineAdder>,
+    removeTimeline: suspend (Long) -> Unit,
     navigate: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    var showAddTimeline by useState(false)
+    var actionTimelineId by useState<Long?>(null)
+    val bottomSheetState = rememberModalBottomSheetState(
+        if (showAddTimeline || actionTimelineId != null) {
+            ModalBottomSheetValue.Expanded
+        } else {
+            ModalBottomSheetValue.Hidden
+        },
+        confirmStateChange = {
+            showAddTimeline = false
+            actionTimelineId = null
+            false
+        },
+    )
+    val actionTimeline = remember(timelines, actionTimelineId) { timelines[actionTimelineId] }
 
     ModalBottomSheetLayout(
         sheetContent = {
-            if (timelineAdders.isEmpty()) {
+            if (actionTimelineId != null) {
+                actionTimeline!!.Render()
+
+                DropdownMenuItem(
+                    text = { Text(text = "Delete this timeline") },
+                    onClick = {
+                        scope.launch {
+                            val id = actionTimelineId!!
+                            actionTimelineId = null
+                            removeTimeline(id)
+                        }
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                        )
+                    },
+                    colors = MenuDefaults.itemColors(
+                        textColor = MaterialTheme.colorScheme.error,
+                    ),
+                )
+            } else if (timelineAdders.isEmpty()) {
                 DropdownMenuItem(
                     text = { Text(text = "No timeline adders found") },
                     onClick = {},
@@ -98,9 +145,14 @@ private fun ListTimelines(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-                                navigate("timelines/$i")
-                            },
+                            .combinedClickable(
+                                onClick = {
+                                    navigate("timelines/$i")
+                                },
+                                onLongClick = {
+                                    actionTimelineId = i
+                                },
+                            ),
                     ) {
                         timeline.Render()
                     }
@@ -113,7 +165,7 @@ private fun ListTimelines(
                     .padding(bottom = 16.dp),
             ) {
                 scope.launch {
-                    bottomSheetState.show()
+                    showAddTimeline = true
                 }
             }
         }
@@ -158,13 +210,14 @@ private fun PreviewListTimelines() {
                 )
             }
         }
-    }
+    }.toMap()
     val timelineAdders = PreviewTimelineAdderProvider().values.toList()
 
     ContralTheme {
         ListTimelines(
             timelines = timelines,
             timelineAdders = timelineAdders,
+            removeTimeline = {},
             navigate = {},
         )
     }

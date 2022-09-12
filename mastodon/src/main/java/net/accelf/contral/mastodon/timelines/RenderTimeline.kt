@@ -46,7 +46,7 @@ internal fun RenderTimeline(
             modifier = Modifier
                 .fillMaxHeight()
                 .weight(1f),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = "Home",

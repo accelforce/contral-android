@@ -4,13 +4,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import net.accelf.contral.api.plugin.MinorVersion.Companion.minor
 import net.accelf.contral.api.plugin.MinorVersion.Companion.patch
 import net.accelf.contral.api.plugin.PluginResolver
+import net.accelf.contral.api.ui.utils.staticCompositionLocalOf
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.models.Account
 import net.accelf.contral.mastodon.pages.accounts.create.CreateAccountPage
@@ -70,6 +70,4 @@ fun PluginResolver.mastodonPlugin() {
     )
 }
 
-internal val LocalMastodonDatabase = staticCompositionLocalOf<MastodonDatabase> {
-    error("LocalMastodonDatabase is not set")
-}
+internal val LocalMastodonDatabase by staticCompositionLocalOf<MastodonDatabase>()

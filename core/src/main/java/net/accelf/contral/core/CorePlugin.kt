@@ -3,7 +3,6 @@ package net.accelf.contral.core
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -13,6 +12,7 @@ import net.accelf.contral.api.plugin.Plugin
 import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.ui.utils.staticCompositionLocalOf
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.core.pages.plugins.PluginsPage
 import net.accelf.contral.core.pages.timelines.ListTimelinesPage
@@ -48,13 +48,7 @@ internal fun PluginResolver.corePlugin() {
     }
 }
 
-internal val LocalPlugins = staticCompositionLocalOf<List<Plugin>> { error("LocalPlugins is not set") }
-internal val LocalTimelineController = staticCompositionLocalOf<TimelineController> {
-    error("LocalTimelineController is not set")
-}
-internal val LocalTimelineAdders = staticCompositionLocalOf<List<TimelineAdder>> {
-    error("LocalTimelineAdders is not set")
-}
-internal val LocalContralDatabase = staticCompositionLocalOf<ContralDatabase> {
-    error("LocalContralDatabase is not set")
-}
+internal val LocalPlugins by staticCompositionLocalOf<List<Plugin>>()
+internal val LocalTimelineController by staticCompositionLocalOf<TimelineController>()
+internal val LocalTimelineAdders by staticCompositionLocalOf<List<TimelineAdder>>()
+internal val LocalContralDatabase by staticCompositionLocalOf<ContralDatabase>()

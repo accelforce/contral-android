@@ -2,9 +2,9 @@ package net.accelf.contral.api.timelines
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.paging.Pager
 import net.accelf.contral.api.composers.Composer
+import net.accelf.contral.api.ui.utils.compositionLocalOf
 
 interface Timeline {
     @Composable
@@ -19,4 +19,4 @@ interface Timeline {
     fun Render()
 }
 
-val LocalTimeline = compositionLocalOf<Timeline> { error("LocalTimeline is not set") }
+val LocalTimeline by compositionLocalOf<Timeline>()

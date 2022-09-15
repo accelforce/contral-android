@@ -24,7 +24,7 @@ internal class StatusRemoteMediator(
             .runCatching { this?.let { loader(this, state.config.pageSize) } ?: emptyList() }
             .fold(
                 { loaded ->
-                    pagingSource.putAll(loaded.map { it.id to it })
+                    pagingSource.putAll(loaded)
                     MediatorResult.Success(endOfPaginationReached = loaded.isEmpty())
                 },
                 {

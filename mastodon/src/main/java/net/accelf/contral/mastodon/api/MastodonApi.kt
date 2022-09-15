@@ -31,6 +31,16 @@ interface MastodonApi {
         @Field("status") content: String,
     ): Status
 
+    @POST("/api/v1/statuses/{id}/favourite")
+    suspend fun favouriteStatus(
+        @Path("id") id: String,
+    ): Status
+
+    @POST("/api/v1/statuses/{id}/unfavourite")
+    suspend fun unFavouriteStatus(
+        @Path("id") id: String,
+    ): Status
+
     companion object {
         internal fun create(domain: String, accessToken: String?): MastodonApi = retrofitBuilder
             .client(

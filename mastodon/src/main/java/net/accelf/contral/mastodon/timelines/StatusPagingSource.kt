@@ -27,8 +27,11 @@ internal class StatusPagingSource(
                 )
             }
 
-    fun putAll(values: List<Pair<String, Status>>) {
-        statuses.putAll(values)
+    fun replace(updated: Status) =
+        statuses.replace(updated.id, updated).also { invalidate() }
+
+    fun putAll(values: List<Status>) {
+        statuses.putAll(values.map { it.id to it })
         invalidate()
     }
 }

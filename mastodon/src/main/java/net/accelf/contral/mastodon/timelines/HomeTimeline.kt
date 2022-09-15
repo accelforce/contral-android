@@ -37,7 +37,8 @@ internal class HomeTimeline(
 
     @Transient
     private val pagingSourceRef = Reference<StatusPagingSource>()
-    private var pagingSource by pagingSourceRef
+    var pagingSource by pagingSourceRef
+        private set
 
     @Composable
     @SuppressLint("ComposableNaming")

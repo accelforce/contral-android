@@ -11,6 +11,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.timelines.TimelineItemAction
 import kotlin.reflect.KClass
 
 class PluginResolver(
@@ -66,6 +67,11 @@ class PluginResolver(
         timelineAdders.add(TimelineAdder(render, onClick))
     }
 
+    private val timelineItemActions = mutableListOf<TimelineItemAction>()
+    fun addTimelineItemAction(action: TimelineItemAction) {
+        timelineItemActions.add(action)
+    }
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun build() = Plugin(
         id = id,
@@ -78,5 +84,6 @@ class PluginResolver(
         },
         timelines = timelines,
         timelineAdders = timelineAdders,
+        timelineItemActions = timelineItemActions,
     )
 }

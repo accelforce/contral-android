@@ -12,6 +12,7 @@ import net.accelf.contral.api.plugin.Plugin
 import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.timelines.TimelineItemAction
 import net.accelf.contral.api.ui.utils.staticCompositionLocalOf
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.core.pages.plugins.PluginsPage
@@ -21,9 +22,16 @@ import net.accelf.contral.core.pages.timelines.TimelineController
 
 internal fun PluginResolver.corePlugin() {
     name = "Contral Core"
-    version = 0 minor 7 patch 0
+    version = 0 minor 8 patch 0
 
     addDatabase(LocalContralDatabase)
+
+    inject {
+        val plugins = LocalPlugins.current
+        val actions = plugins.map(Plugin::timelineItemActions).flatten()
+
+        LocalTimelineItemActions provides actions
+    }
 
     addRoutes {
         composable("plugins") { PluginsPage() }
@@ -51,4 +59,5 @@ internal fun PluginResolver.corePlugin() {
 internal val LocalPlugins by staticCompositionLocalOf<List<Plugin>>()
 internal val LocalTimelineController by staticCompositionLocalOf<TimelineController>()
 internal val LocalTimelineAdders by staticCompositionLocalOf<List<TimelineAdder>>()
+internal val LocalTimelineItemActions by staticCompositionLocalOf<List<TimelineItemAction>>()
 internal val LocalContralDatabase by staticCompositionLocalOf<ContralDatabase>()

@@ -17,13 +17,14 @@ import net.accelf.contral.mastodon.pages.accounts.create.CreateAccountPage
 import net.accelf.contral.mastodon.pages.accounts.show.ShowAccountPage
 import net.accelf.contral.mastodon.pages.timelines.create.CreateTimelinePage
 import net.accelf.contral.mastodon.timelines.HomeTimeline
+import net.accelf.contral.mastodon.timelines.actions.FavoriteAction
 
 @Suppress("unused")
 fun PluginResolver.mastodonPlugin() {
     name = "Mastodon"
     version = 0 minor 0 patch 0
 
-    require("core", 0 minor 7)
+    require("core", 0 minor 8)
 
     addDatabase(LocalMastodonDatabase)
 
@@ -68,6 +69,8 @@ fun PluginResolver.mastodonPlugin() {
         render = { Text(text = "Add a Mastodon timeline") },
         onClick = { it("mastodon/timelines/create") },
     )
+
+    addTimelineItemAction(FavoriteAction)
 }
 
 internal val LocalMastodonDatabase by staticCompositionLocalOf<MastodonDatabase>()

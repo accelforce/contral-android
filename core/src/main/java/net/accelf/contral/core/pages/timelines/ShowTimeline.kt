@@ -5,6 +5,7 @@ package net.accelf.contral.core.pages.timelines
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,6 +31,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import net.accelf.contral.api.composers.Composer
 import net.accelf.contral.api.timelines.LocalTimeline
+import net.accelf.contral.api.timelines.LocalTimelineItem
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.utils.useState
@@ -131,8 +133,17 @@ internal fun ShowTimeline(
                     items(
                         items = pagingItems,
                     ) {
-                        it?.Render()
-                        Divider()
+                        CompositionLocalProvider(
+                            LocalTimelineItem provides it!!,
+                        ) {
+                            it.Render()
+                            TimelineItemActionBar(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                            )
+                            Divider()
+                        }
                     }
                 }
             }

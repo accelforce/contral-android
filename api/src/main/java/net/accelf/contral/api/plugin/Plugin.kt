@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
 import androidx.navigation.NavGraphBuilder
 import net.accelf.contral.api.timelines.TimelineAdder
+import net.accelf.contral.api.timelines.TimelineItemAction
 import kotlin.reflect.KClass
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -17,4 +18,5 @@ class Plugin(
     val renderRoutes: (NavGraphBuilder).() -> Unit,
     val timelines: List<KClass<*>>,
     val timelineAdders: List<TimelineAdder>,
+    val timelineItemActions: List<TimelineItemAction>,
 )

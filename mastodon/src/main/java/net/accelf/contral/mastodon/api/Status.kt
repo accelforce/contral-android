@@ -46,6 +46,7 @@ data class Status(
     @SerialName("content") val content: Html,
     @SerialName("reblog") val boostedStatus: Status?,
     @SerialName("spoiler_text") val contentsWarning: String,
+    @SerialName("favourited") val favourited: Boolean,
 ) : TimelineItem {
 
     @Composable
@@ -193,6 +194,7 @@ internal class PreviewStatusProvider : PreviewParameterProvider<Status> {
                 content = "Hi!<br>This is a sample post.",
                 boostedStatus = null,
                 contentsWarning = "CW",
+                favourited = true,
             ),
             Status(
                 id = "234567890234567890",
@@ -204,8 +206,10 @@ internal class PreviewStatusProvider : PreviewParameterProvider<Status> {
                     content = "Hi!<br>This is a sample post.",
                     boostedStatus = null,
                     contentsWarning = "",
+                    favourited = false,
                 ),
                 contentsWarning = "",
+                favourited = false,
             ),
         )
 }

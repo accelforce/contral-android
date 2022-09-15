@@ -36,8 +36,18 @@ interface MastodonApi {
         @Path("id") id: String,
     ): Status
 
+    @POST("/api/v1/statuses/{id}/reblog")
+    suspend fun boostStatus(
+        @Path("id") id: String,
+    ): Status
+
     @POST("/api/v1/statuses/{id}/unfavourite")
     suspend fun unFavouriteStatus(
+        @Path("id") id: String,
+    ): Status
+
+    @POST("/api/v1/statuses/{id}/unreblog")
+    suspend fun unBoostStatus(
         @Path("id") id: String,
     ): Status
 

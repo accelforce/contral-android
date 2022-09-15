@@ -46,8 +46,18 @@ data class Status(
     @SerialName("content") val content: Html,
     @SerialName("reblog") val boostedStatus: Status?,
     @SerialName("spoiler_text") val contentsWarning: String,
-    @SerialName("favourited") val favourited: Boolean,
+    @SerialName("favourited") val apiFavorited: Boolean,
+    @SerialName("reblogged") val apiBoosted: Boolean,
 ) : TimelineItem {
+
+    internal val isActionable: Boolean
+        get() = boostedStatus == null
+    internal val actionableStatus: Status
+        get() = boostedStatus ?: this
+    internal val favorited: Boolean
+        get() = actionableStatus.apiFavorited
+    internal val boosted: Boolean
+        get() = actionableStatus.apiBoosted
 
     @Composable
     override fun Render() {
@@ -194,7 +204,8 @@ internal class PreviewStatusProvider : PreviewParameterProvider<Status> {
                 content = "Hi!<br>This is a sample post.",
                 boostedStatus = null,
                 contentsWarning = "CW",
-                favourited = true,
+                apiFavorited = false,
+                apiBoosted = false,
             ),
             Status(
                 id = "234567890234567890",
@@ -206,10 +217,12 @@ internal class PreviewStatusProvider : PreviewParameterProvider<Status> {
                     content = "Hi!<br>This is a sample post.",
                     boostedStatus = null,
                     contentsWarning = "",
-                    favourited = false,
+                    apiFavorited = true,
+                    apiBoosted = true,
                 ),
                 contentsWarning = "",
-                favourited = false,
+                apiFavorited = false,
+                apiBoosted = false,
             ),
         )
 }

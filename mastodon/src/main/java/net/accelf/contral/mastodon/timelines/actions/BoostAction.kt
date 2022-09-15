@@ -3,7 +3,7 @@ package net.accelf.contral.mastodon.timelines.actions
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Cached
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,17 +15,17 @@ import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.mastodon.api.PreviewStatusProvider
 import net.accelf.contral.mastodon.api.Status
 
-internal object FavoriteAction : StatusAction() {
+internal object BoostAction : StatusAction() {
 
     private fun title(timelineItem: Status) =
-        when (timelineItem.favorited) {
-            true -> "Un-favourite"
-            false -> "Favourite"
+        when (timelineItem.boosted) {
+            true -> "Un-boost"
+            false -> "Boost"
         }
 
     @Composable
     private fun color(timelineItem: Status) =
-        when (timelineItem.favorited) {
+        when (timelineItem.boosted) {
             true -> MaterialTheme.colorScheme.primary
             false -> MaterialTheme.colorScheme.onBackground
         }
@@ -33,7 +33,7 @@ internal object FavoriteAction : StatusAction() {
     @Composable
     override fun Icon(timelineItem: Status) {
         Icon(
-            imageVector = Icons.Default.Star,
+            imageVector = Icons.Default.Cached,
             contentDescription = title(timelineItem),
             tint = color(timelineItem),
         )
@@ -45,7 +45,7 @@ internal object FavoriteAction : StatusAction() {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Default.Star,
+                imageVector = Icons.Default.Cached,
                 contentDescription = null,
                 tint = color(timelineItem),
             )
@@ -60,14 +60,14 @@ internal object FavoriteAction : StatusAction() {
         val timeline = stateHolder.timeline
         val mastodonApi = stateHolder.mastodonApi
 
-        when {
-            timelineItem.favorited -> mastodonApi?.unFavouriteStatus(timelineItem.actionableStatus.id)
-            else -> mastodonApi?.favouriteStatus(timelineItem.actionableStatus.id)
+        when (timelineItem.boosted) {
+            true -> mastodonApi?.unBoostStatus(timelineItem.actionableStatus.id)
+            false -> mastodonApi?.boostStatus(timelineItem.actionableStatus.id)?.boostedStatus
         }
             ?.let { updated ->
                 timeline?.pagingSource?.replace(updated)
-                if (!timelineItem.isActionable) {
-                    timeline?.pagingSource?.replace(timelineItem.copy(boostedStatus = updated))
+                if (!timelineItem.isActionable && !updated.boosted) {
+                    timeline?.pagingSource?.remove(timelineItem)
                 }
             }
     }
@@ -80,8 +80,8 @@ private fun PreviewStatusAction(
 ) {
     ContralTheme {
         Column {
-            FavoriteAction.Icon(timelineItem = status)
-            FavoriteAction.MenuItem(timelineItem = status)
+            BoostAction.Icon(timelineItem = status)
+            BoostAction.MenuItem(timelineItem = status)
         }
     }
 }

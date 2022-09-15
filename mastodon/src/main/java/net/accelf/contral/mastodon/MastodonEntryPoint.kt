@@ -17,6 +17,7 @@ import net.accelf.contral.mastodon.pages.accounts.create.CreateAccountPage
 import net.accelf.contral.mastodon.pages.accounts.show.ShowAccountPage
 import net.accelf.contral.mastodon.pages.timelines.create.CreateTimelinePage
 import net.accelf.contral.mastodon.timelines.HomeTimeline
+import net.accelf.contral.mastodon.timelines.actions.BoostAction
 import net.accelf.contral.mastodon.timelines.actions.FavoriteAction
 
 @Suppress("unused")
@@ -71,6 +72,7 @@ fun PluginResolver.mastodonPlugin() {
     )
 
     addTimelineItemAction(FavoriteAction)
+    addTimelineItemAction(BoostAction)
 }
 
 internal val LocalMastodonDatabase by staticCompositionLocalOf<MastodonDatabase>()

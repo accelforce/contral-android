@@ -71,9 +71,13 @@ internal fun ShowTimeline(
             pagingItems.refresh()
         },
         modifier = Modifier.fillMaxSize(),
-        indicator = { _, distance ->
+        indicator = { state, distance ->
             SwipeRefreshIndicator(
-                state = SwipeRefreshState(pagingItems.loadState.refresh == LoadState.Loading),
+                state = if (state.isSwipeInProgress) {
+                    state
+                } else {
+                    SwipeRefreshState(pagingItems.loadState.refresh == LoadState.Loading)
+                },
                 refreshTriggerDistance = distance,
             )
         },

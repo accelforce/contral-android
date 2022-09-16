@@ -19,7 +19,10 @@ internal class StatusRemoteMediator(
         when (loadType) {
             LoadType.PREPEND -> null
             LoadType.APPEND -> LoadKey(minId = null, maxId = state.lastItemOrNull()?.id)
-            LoadType.REFRESH -> LoadKey(minId = null, maxId = null)
+            LoadType.REFRESH -> {
+                pagingSource.removeAll()
+                LoadKey(minId = null, maxId = null)
+            }
         }
             .runCatching { this?.let { loader(this, state.config.pageSize) } ?: emptyList() }
             .fold(

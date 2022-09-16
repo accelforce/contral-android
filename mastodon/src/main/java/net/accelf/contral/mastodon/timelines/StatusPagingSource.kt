@@ -30,6 +30,11 @@ internal class StatusPagingSource(
     fun replace(updated: Status) =
         statuses.replace(updated.id, updated).also { invalidate() }
 
+    fun removeAll() {
+        statuses.clear()
+        invalidate()
+    }
+
     fun remove(status: Status) =
         statuses.remove(status.id).also { invalidate() }
 

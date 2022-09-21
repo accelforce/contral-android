@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    namespace 'net.accelf.contral.api'
+
     compileSdk 33
 
     defaultConfig {

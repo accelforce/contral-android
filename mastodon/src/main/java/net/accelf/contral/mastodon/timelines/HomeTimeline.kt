@@ -86,7 +86,7 @@ internal class HomeTimeline(
 
         LaunchedEffect(Unit) {
             dbAccount = db.accountDao().getAccount(domain, id)
-            apiAccount = dbAccount!!.mastodonApi.getSelfAccount()
+            apiAccount = runCatching { dbAccount!!.mastodonApi.getSelfAccount() }.getOrNull()
         }
 
         dbAccount?.let {

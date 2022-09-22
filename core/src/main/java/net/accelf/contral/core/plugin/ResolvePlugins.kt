@@ -58,15 +58,17 @@ private fun collectPluginsFromPackages(context: Context) =
             }
                 .flatten()
                 .filter(String::isNotBlank)
-                .map {
+                .mapNotNull {
                     val index = it.lastIndexOf('.')
-                    PluginResolver(it)
-                        .apply {
-                            loader.loadClass(it.substring(0, index))
-                                .getMethod(it.substring(index + 1), PluginResolver::class.java)
-                                .invoke(null, this)
-                        }
-                        .build()
+                    runCatching {
+                        PluginResolver(it)
+                            .apply {
+                                loader.loadClass(it.substring(0, index))
+                                    .getMethod(it.substring(index + 1), PluginResolver::class.java)
+                                    .invoke(null, this)
+                            }
+                            .build()
+                    }.getOrNull()
                 }
         }
 

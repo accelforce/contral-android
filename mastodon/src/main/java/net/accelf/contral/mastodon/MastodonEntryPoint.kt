@@ -25,7 +25,7 @@ fun PluginResolver.mastodonPlugin() {
     name = "Mastodon"
     version = 0 minor 0 patch 0
 
-    require("core", 0 minor 8)
+    require("core", 0 minor 9)
 
     addDatabase(LocalMastodonDatabase)
 

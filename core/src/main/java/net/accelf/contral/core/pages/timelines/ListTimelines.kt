@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.paging.Pager
 import kotlinx.coroutines.launch
-import net.accelf.contral.api.composers.Composer
+import net.accelf.contral.api.timelines.AbstractTimeline
 import net.accelf.contral.api.timelines.Timeline
 import net.accelf.contral.api.timelines.TimelineAdder
 import net.accelf.contral.api.timelines.TimelineItem
@@ -194,14 +194,10 @@ internal class PreviewTimelineAdderProvider : PreviewParameterProvider<TimelineA
 @Preview(heightDp = 320)
 private fun PreviewListTimelines() {
     val timelines = List(30) {
-        it.toLong() to object : Timeline {
+        it.toLong() to object : AbstractTimeline() {
             @Composable
             @SuppressLint("ComposableNaming")
             override fun getPager(setPager: (Pager<*, out TimelineItem>) -> Unit) {}
-
-            @Composable
-            @SuppressLint("ComposableNaming")
-            override fun getComposer(setComposer: (Composer) -> Unit) {}
 
             @Composable
             override fun Render() {

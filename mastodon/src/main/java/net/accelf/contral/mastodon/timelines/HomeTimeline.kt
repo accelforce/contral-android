@@ -12,7 +12,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import net.accelf.contral.api.composers.Composer
-import net.accelf.contral.api.timelines.Timeline
+import net.accelf.contral.api.timelines.AbstractTimeline
 import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.LocalMastodonDatabase
@@ -28,7 +28,7 @@ import net.accelf.contral.mastodon.models.Account as DBAccount
 internal class HomeTimeline(
     @SerialName("domain") val domain: String,
     @SerialName("id") val id: String,
-) : Timeline {
+) : AbstractTimeline() {
 
     @Transient
     private val statuses = TreeMap<String, Status> { o1, o2 ->

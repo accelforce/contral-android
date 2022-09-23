@@ -176,14 +176,12 @@ data class Status(
                     ) {
                         HtmlText(
                             html = content,
-                        ) { annotations ->
-                            annotations.forEach { annotation ->
-                                when (annotation.tag) {
-                                    HtmlAnnotations.URL.tag -> {
-                                        uriHandler.openUri(annotation.item)
-                                        return@HtmlText
-                                    }
+                        ) { annotation ->
+                            when (annotation.tag) {
+                                HtmlAnnotations.URL.tag -> {
+                                    { uriHandler.openUri(annotation.item) }
                                 }
+                                else -> null
                             }
                         }
                     }

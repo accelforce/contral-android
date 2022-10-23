@@ -22,7 +22,7 @@ import net.accelf.contral.core.pages.timelines.TimelineController
 
 internal fun PluginResolver.corePlugin() {
     name = "Contral Core"
-    version = 0 minor 9 patch 0
+    version = 0 minor 10 patch 0
 
     addDatabase(LocalContralDatabase)
 

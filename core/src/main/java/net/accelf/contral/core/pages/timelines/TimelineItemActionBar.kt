@@ -1,5 +1,6 @@
 package net.accelf.contral.core.pages.timelines
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,6 +80,12 @@ private fun PreviewRenderTimelineItemActionBar() {
                 override fun Render() {
                     TODO()
                 }
+
+                @Composable
+                @SuppressLint("ComposableNaming")
+                override fun getOnSelected(setOnSelected: (() -> Unit) -> Unit) {
+                    TODO()
+                }
             },
             actions = List(5) {
                 object : TimelineItemAction {
@@ -103,7 +110,7 @@ private fun PreviewRenderTimelineItemActionBar() {
                         timelineItem: TimelineItem,
                         stateHolder: StateHolder,
                     ) {
-                        TODO("")
+                        TODO()
                     }
                 }
             },

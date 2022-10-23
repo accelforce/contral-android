@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,14 +28,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import net.accelf.contral.api.timelines.LocalTimeline
 import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.LocalNavController
 import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
-import net.accelf.contral.mastodon.timelines.HomeTimeline
+import net.accelf.contral.mastodon.pages.ApiSource
+import net.accelf.contral.mastodon.pages.LocalApiSource
 import net.accelf.contral.mastodon.ui.Html
 import net.accelf.contral.mastodon.ui.HtmlAnnotations
 import net.accelf.contral.mastodon.ui.HtmlText
@@ -46,8 +48,8 @@ data class Status(
     @SerialName("content") val content: Html,
     @SerialName("reblog") val boostedStatus: Status?,
     @SerialName("spoiler_text") val contentsWarning: String,
-    @SerialName("favourited") val apiFavorited: Boolean,
-    @SerialName("reblogged") val apiBoosted: Boolean,
+    @SerialName("favourited") val apiFavorited: Boolean = false,
+    @SerialName("reblogged") val apiBoosted: Boolean = false,
 ) : TimelineItem {
 
     internal val isActionable: Boolean
@@ -62,11 +64,11 @@ data class Status(
     @Composable
     override fun Render() {
         val navController = LocalNavController.current
-        val timeline = LocalTimeline.current as HomeTimeline
+        val source = LocalApiSource.current
 
         Render(
             openAccount = {
-                navController.navigate(it.path(timeline.domain, timeline.id))
+                navController.navigate(it.path(source.domain, source.id))
             },
         )
     }
@@ -189,6 +191,22 @@ data class Status(
             }
         }
     }
+
+    @Composable
+    @Suppress("ComposableNaming")
+    override fun getOnSelected(setOnSelected: (() -> Unit) -> Unit) {
+        val scope = rememberCoroutineScope()
+        val navController = LocalNavController.current
+        val source = LocalApiSource.current
+
+        setOnSelected {
+            scope.launch {
+                navController.navigate(path(source))
+            }
+        }
+    }
+
+    private fun path(source: ApiSource) = "mastodon/statuses/${source.domain}/$id?sourceId=${source.id}"
 }
 
 internal class PreviewStatusProvider : PreviewParameterProvider<Status> {

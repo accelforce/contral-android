@@ -1,9 +1,6 @@
 package net.accelf.contral.mastodon
 
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -11,10 +8,10 @@ import net.accelf.contral.api.plugin.MinorVersion.Companion.minor
 import net.accelf.contral.api.plugin.MinorVersion.Companion.patch
 import net.accelf.contral.api.plugin.PluginResolver
 import net.accelf.contral.api.ui.utils.staticCompositionLocalOf
-import net.accelf.contral.api.ui.utils.useState
-import net.accelf.contral.mastodon.models.Account
+import net.accelf.contral.mastodon.pages.WithSourceAccount
 import net.accelf.contral.mastodon.pages.accounts.create.CreateAccountPage
 import net.accelf.contral.mastodon.pages.accounts.show.ShowAccountPage
+import net.accelf.contral.mastodon.pages.statuses.show.ShowStatusPage
 import net.accelf.contral.mastodon.pages.timelines.create.CreateTimelinePage
 import net.accelf.contral.mastodon.timelines.HomeTimeline
 import net.accelf.contral.mastodon.timelines.actions.BoostAction
@@ -25,7 +22,7 @@ fun PluginResolver.mastodonPlugin() {
     name = "Mastodon"
     version = 0 minor 0 patch 0
 
-    require("core", 0 minor 9)
+    require("core", 0 minor 10)
 
     addDatabase(LocalMastodonDatabase)
 
@@ -43,22 +40,28 @@ fun PluginResolver.mastodonPlugin() {
             ),
         ) {
             val id = it.arguments!!.getString("id")!!
-            val domain = it.arguments!!.getString("domain")!!
-            val sourceId = it.arguments!!.getString("sourceId")
-            var sourceAccount by useState<Account?>(null)
 
-            sourceId?.let {
-                val db = LocalMastodonDatabase.current
-                LaunchedEffect(db, domain, sourceId) {
-                    sourceAccount = db.accountDao().getAccount(domain, sourceId)
-                }
+            it.WithSourceAccount {
+                ShowAccountPage(id)
             }
+        }
 
-            ShowAccountPage(
-                id = id,
-                domain = domain,
-                sourceDBAccount = sourceAccount,
-            )
+        composable(
+            "mastodon/statuses/{domain}/{id}?sourceId={sourceId}",
+            listOf(
+                navArgument("domain") { type = NavType.StringType },
+                navArgument("id") { type = NavType.StringType },
+                navArgument("sourceId") {
+                    type = NavType.StringType
+                    nullable = true
+                },
+            ),
+        ) {
+            val id = it.arguments!!.getString("id")!!
+
+            it.WithSourceAccount {
+                ShowStatusPage(id)
+            }
         }
 
         composable("mastodon/timelines/create") { CreateTimelinePage() }

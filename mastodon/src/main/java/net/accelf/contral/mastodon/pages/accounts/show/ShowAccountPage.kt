@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -28,48 +27,19 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import net.accelf.contral.api.ui.theme.ContralTheme
 import net.accelf.contral.api.ui.utils.useState
-import net.accelf.contral.mastodon.api.MastodonApi
+import net.accelf.contral.mastodon.api.Account
 import net.accelf.contral.mastodon.api.PreviewAccountProvider
-import net.accelf.contral.mastodon.api.Account as ApiAccount
-import net.accelf.contral.mastodon.models.Account as DBAccount
+import net.accelf.contral.mastodon.pages.LocalApiSource
 
 @Composable
 internal fun ShowAccountPage(
     id: String,
-    domain: String,
-    sourceDBAccount: DBAccount?,
 ) {
-    val scope = rememberCoroutineScope()
-    val mastodonApi = remember(domain, sourceDBAccount) { MastodonApi.create(domain, sourceDBAccount?.accessToken) }
-    var account by useState<ApiAccount?>(null)
-    var sourceApiAccount by useState<ApiAccount?>(null)
-    var loading by useState(false)
-
-    val loadAccount = suspend {
-        loading = true
-        account = mastodonApi.getAccount(id)
-        loading = false
-    }
-
-    LaunchedEffect(mastodonApi.hashCode(), id) {
-        loadAccount()
-    }
-
-    LaunchedEffect(mastodonApi.hashCode()) {
-        sourceApiAccount = sourceDBAccount?.let {
-            mastodonApi.getSelfAccount()
-        }
-    }
+    val mastodonApi = LocalApiSource.current.mastodonApi
 
     ShowAccount(
-        account = account,
-        domain = domain,
-        sourceAccount = sourceApiAccount,
-        loading = loading,
-        onRefresh = {
-            scope.launch {
-                loadAccount()
-            }
+        getAccount = remember(mastodonApi.hashCode(), id) {
+            suspend { mastodonApi.getAccount(id) }
         },
     )
 }
@@ -79,87 +49,68 @@ private const val AvatarSize = 64
 
 @Composable
 private fun ShowAccount(
-    account: ApiAccount?,
-    domain: String,
-    sourceAccount: ApiAccount?,
-    loading: Boolean,
-    onRefresh: () -> Unit,
+    getAccount: suspend () -> Account,
 ) {
+    val scope = rememberCoroutineScope()
+    var account by useState<Account?>(null)
+    var loading by useState(false)
+    val loadAccount = remember(getAccount.hashCode()) {
+        suspend {
+            loading = true
+            account = getAccount()
+            loading = false
+        }
+    }
+
+    LaunchedEffect(loadAccount.hashCode()) {
+        loadAccount()
+    }
+
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing = loading),
-        onRefresh = onRefresh,
+        onRefresh = { scope.launch { loadAccount() } },
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            ) {
-                Text(
-                    text = "Viewing as",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(end = 4.dp),
+        account?.let {
+            BoxWithConstraints {
+                AsyncImage(
+                    model = it.header,
+                    contentDescription = "Header",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(HeaderRatio),
+                    contentScale = ContentScale.FillWidth,
                 )
 
-                sourceAccount?.let {
-                    AsyncImage(
-                        model = sourceAccount.avatar,
-                        contentDescription = "@${sourceAccount.acct}",
-                        modifier = Modifier
-                            .size(16.dp)
-                            .padding(end = 2.dp),
-                    )
-                }
+                Column(
+                    modifier = Modifier.padding(
+                        top = this@BoxWithConstraints.maxWidth / HeaderRatio - (AvatarSize / 3).dp,
+                    ),
+                ) {
+                    Row {
+                        AsyncImage(
+                            model = it.avatar,
+                            contentDescription = "Avatar",
+                            modifier = Modifier
+                                .size(AvatarSize.dp)
+                                .padding(4.dp),
+                        )
 
-                Text(
-                    text = sourceAccount?.let { "@${sourceAccount.acct}" } ?: "$domain (Public)",
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            }
-
-            account?.let {
-                BoxWithConstraints {
-                    AsyncImage(
-                        model = account.header,
-                        contentDescription = "Header",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(HeaderRatio),
-                        contentScale = ContentScale.FillWidth,
-                    )
-
-                    Column(
-                        modifier = Modifier.padding(
-                            top = this@BoxWithConstraints.maxWidth / HeaderRatio - (AvatarSize / 3).dp,
-                        ),
-                    ) {
-                        Row {
-                            AsyncImage(
-                                model = account.avatar,
-                                contentDescription = "Avatar",
-                                modifier = Modifier
-                                    .size(AvatarSize.dp)
-                                    .padding(4.dp),
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Bottom)
+                                .padding(start = 4.dp, bottom = 4.dp),
+                        ) {
+                            Text(
+                                text = it.displayName,
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleSmall,
                             )
 
-                            Column(
-                                modifier = Modifier
-                                    .align(Alignment.Bottom)
-                                    .padding(start = 4.dp, bottom = 4.dp),
-                            ) {
-                                Text(
-                                    text = account.displayName,
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.titleSmall,
-                                )
-
-                                Text(
-                                    text = "@${account.acct}",
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            }
+                            Text(
+                                text = "@${it.acct}",
+                                maxLines = 1,
+                                style = MaterialTheme.typography.labelSmall,
+                            )
                         }
                     }
                 }
@@ -168,59 +119,14 @@ private fun ShowAccount(
     }
 }
 
-internal data class PreviewShowAccountParameter(
-    val account: ApiAccount?,
-    val domain: String,
-    val sourceAccount: ApiAccount?,
-    val loading: Boolean,
-)
-
-internal class PreviewShowAccountParameterProvider : PreviewParameterProvider<PreviewShowAccountParameter> {
-    private val accountProvider = PreviewAccountProvider()
-
-    override val values: Sequence<PreviewShowAccountParameter>
-        get() = sequenceOf(
-            PreviewShowAccountParameter(
-                account = null,
-                domain = "example.domain",
-                sourceAccount = null,
-                loading = true,
-            ),
-            PreviewShowAccountParameter(
-                account = accountProvider.values.first(),
-                domain = "example.domain",
-                sourceAccount = null,
-                loading = false,
-            ),
-            PreviewShowAccountParameter(
-                account = accountProvider.values.last(),
-                domain = "example.domain",
-                sourceAccount = accountProvider.values.first(),
-                loading = true,
-            ),
-            PreviewShowAccountParameter(
-                account = accountProvider.values.last(),
-                domain = "example.domain",
-                sourceAccount = accountProvider.values.last(),
-                loading = false,
-            ),
-        )
-}
-
 @Composable
 @Preview(widthDp = 300, heightDp = 300)
 private fun PreviewShowAccount(
-    @PreviewParameter(PreviewShowAccountParameterProvider::class) parameter: PreviewShowAccountParameter,
+    @PreviewParameter(PreviewAccountProvider::class) account: Account,
 ) {
-    val (account, domain, sourceAccount, loading) = parameter
-
     ContralTheme {
         ShowAccount(
-            account = account,
-            domain = domain,
-            sourceAccount = sourceAccount,
-            loading = loading,
-            onRefresh = {},
+            getAccount = { account },
         )
     }
 }

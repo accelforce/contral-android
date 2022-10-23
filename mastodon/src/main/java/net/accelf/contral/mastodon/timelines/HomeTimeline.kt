@@ -2,8 +2,10 @@ package net.accelf.contral.mastodon.timelines
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.setValue
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
@@ -17,7 +19,10 @@ import net.accelf.contral.api.timelines.TimelineItem
 import net.accelf.contral.api.ui.utils.useState
 import net.accelf.contral.mastodon.LocalMastodonDatabase
 import net.accelf.contral.mastodon.MastodonComposer
+import net.accelf.contral.mastodon.api.MastodonApi
 import net.accelf.contral.mastodon.api.Status
+import net.accelf.contral.mastodon.pages.AccountApiSource
+import net.accelf.contral.mastodon.pages.LocalApiSource
 import net.accelf.contral.mastodon.util.Reference
 import java.util.*
 import net.accelf.contral.mastodon.api.Account as ApiAccount
@@ -39,6 +44,23 @@ internal class HomeTimeline(
     private val pagingSourceRef = Reference<StatusPagingSource>()
     var pagingSource by pagingSourceRef
         private set
+
+    @Composable
+    override fun ProvideValues(content: @Composable () -> Unit) {
+        val db = LocalMastodonDatabase.current
+
+        val source by produceState<AccountApiSource?>(null, domain, id) {
+            val dbAccount = db.accountDao().getAccount(domain, id)!!
+            val apiAccount = MastodonApi.create(domain, dbAccount.accessToken).getSelfAccount()
+            value = AccountApiSource(domain, dbAccount, apiAccount)
+        }
+
+        source?.let {
+            CompositionLocalProvider(LocalApiSource provides it) {
+                content()
+            }
+        }
+    }
 
     @Composable
     @SuppressLint("ComposableNaming")

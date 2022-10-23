@@ -2,8 +2,10 @@
 
 package net.accelf.contral.core.pages.timelines
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,14 +49,14 @@ internal fun ShowTimelinePage(
         pager = it as Pager<*, TimelineItem>
     }
 
-    CompositionLocalProvider(
-        LocalTimeline provides timeline,
-    ) {
-        pager?.let {
-            ShowTimeline(
-                timeline = timeline,
-                pager = pager!!,
-            )
+    CompositionLocalProvider(LocalTimeline provides timeline) {
+        timeline.ProvideValues {
+            pager?.let {
+                ShowTimeline(
+                    timeline = timeline,
+                    pager = pager!!,
+                )
+            }
         }
     }
 }
@@ -136,12 +138,22 @@ internal fun ShowTimeline(
                         CompositionLocalProvider(
                             LocalTimelineItem provides it!!,
                         ) {
-                            it.Render()
-                            TimelineItemActionBar(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                            )
+                            var onSelect by useState {}
+                            it.getOnSelected { l ->
+                                onSelect = l
+                            }
+                            Column(
+                                modifier = Modifier.clickable {
+                                    onSelect()
+                                },
+                            ) {
+                                it.Render()
+                                TimelineItemActionBar(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                )
+                            }
                             Divider()
                         }
                     }

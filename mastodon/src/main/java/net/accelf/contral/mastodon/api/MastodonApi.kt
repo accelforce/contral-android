@@ -25,6 +25,11 @@ interface MastodonApi {
         @Query("max_id") maxId: String? = null,
     ): List<Status>
 
+    @GET("/api/v1/statuses/{id}")
+    suspend fun getStatus(
+        @Path("id") id: String,
+    ): Status
+
     @POST("/api/v1/statuses")
     @FormUrlEncoded
     suspend fun postStatus(
